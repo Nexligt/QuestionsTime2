@@ -1924,3 +1924,38 @@ html.chooser-active body {
     scale: 1.6;
   }
 }
+
+/* Paramètres > Infos : ligne discrète « Build » sous la version */
+.settings-info__row--discreet {
+  padding-block: 0;
+  font-size: var(--fs-xs);
+}
+
+/* Bandeau « Nouvelle version disponible » (js/ui/updateBanner.js) */
+.update-banner {
+  position: fixed;
+  left: var(--space-300);
+  right: var(--space-300);
+  bottom: calc(var(--tap-size-min) + var(--space-300) + var(--space-200) + var(--safe-bottom));
+  z-index: 80;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: var(--space-200);
+  max-width: 32rem;
+  margin-inline: auto;
+  padding: var(--space-100) var(--space-100) var(--space-100) var(--space-300);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-overlay);
+}
+
+.update-banner__text {
+  margin: 0;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+}
+
+.update-banner__update {
+  padding-inline: var(--space-200);
+  font-size: var(--fs-sm);
+}

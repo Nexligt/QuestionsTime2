@@ -484,3 +484,8 @@ body {
   .chooser--win-4 { background: var(--color-placeholder); }
   .chooser--win-5 { background: var(--color-text-muted); }
 }
+
+.settings-info__row--discreet .settings-info__label,
+.settings-info__row--discreet .settings-info__value { color: var(--color-text-muted); }
+.update-banner { background: var(--color-surface-2); border: 1px solid var(--color-border-strong); color: var(--color-text); }
+.settings-info__row + .settings-info__row--discreet { border-top: none; }

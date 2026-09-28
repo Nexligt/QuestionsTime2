@@ -24,7 +24,8 @@
 */
 
 import { registerView, initRouter, navigateTo, getSubRoute } from "./core/router.js";
-import { registerServiceWorker, isRunningStandalone, initInstallPrompt } from "./core/pwa.js";
+import { registerServiceWorker, isRunningStandalone, initInstallPrompt, initUpdates } from "./core/pwa.js";
+import { showUpdateBanner } from "./ui/updateBanner.js";
 import { initBottomNav } from "./ui/navBar.js";
 import { startSplashIntro } from "./ui/splashIntro.js";
 import { openDatabase } from "./data/db.js";
@@ -131,7 +132,7 @@ initInstallPrompt();
 
 async function bootstrap() {
   await initDataLayer();
-  await registerServiceWorker();
+  const registration = await registerServiceWorker();
   await initBottomNav(document.getElementById("bottom-nav"));
 
   if (isRunningStandalone()) {
@@ -152,6 +153,14 @@ async function bootstrap() {
 
   initRouter("main");
   if (showSplash) startSplashIntro();
+
+  // Mises à jour (vérifiées après le démarrage du Splash, pour savoir s'il
+  // attend encore le premier toucher).
+  initUpdates({
+    registration,
+    isSplashWaiting: () => ["appear", "float", "static"].includes(document.querySelector(".splash-intro")?.dataset.phase),
+    showBanner: (apply) => showUpdateBanner(apply),
+  });
 }
 
 bootstrap();

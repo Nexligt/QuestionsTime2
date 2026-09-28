@@ -23,7 +23,7 @@ test("section Informations présente, dans l'onglet Informations", async () => {
   assert.deepEqual(sections, ["informations"]);
   assert.equal(v.querySelector('[data-setting="informations"] h2').textContent, "Informations");
   const labels = [...v.querySelectorAll(".settings-info__label")].map((e) => e.textContent);
-  assert.deepEqual(labels, ["Version", "Questions de base disponibles", "Questions locales", "Questions supprimées"]);
+  assert.deepEqual(labels, ["Version", "Build", "Questions de base disponibles", "Questions locales", "Questions supprimées"]);
 });
 
 test("version de l'application affichée depuis la constante unique", async () => {

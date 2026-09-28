@@ -12,9 +12,12 @@
 
 import { APP_VERSION } from "../../core/appVersion.js";
 import { getQuestionCounts } from "../../data/questionsRepository.js";
+import { getBuildVersion } from "../../core/pwa.js";
 
 export const INFO_ITEMS = [
   { id: "version", label: "Version", read: () => APP_VERSION },
+  // Version du cache du service worker actif : montre si la mise à jour a eu lieu.
+  { id: "build", label: "Build", read: () => getBuildVersion(), discreet: true },
   { id: "base-count", label: "Questions de base disponibles", read: (ctx) => ctx.counts.baseAvailable },
   { id: "local-count", label: "Questions locales", read: (ctx) => ctx.counts.local },
   { id: "deleted-count", label: "Questions supprimées", read: (ctx) => ctx.counts.deleted },
@@ -35,6 +38,7 @@ export function buildInfoSection(labelledBy) {
     const row = document.createElement("div");
     row.className = "settings-info__row";
     row.dataset.info = item.id;
+    if (item.discreet) row.classList.add("settings-info__row--discreet");
     const term = document.createElement("dt");
     term.className = "settings-info__label";
     term.textContent = item.label;

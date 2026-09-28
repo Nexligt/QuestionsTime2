@@ -17,7 +17,22 @@
   cohérent avec un hébergement GitHub Pages.
 */
 
-const CACHE_NAME = "questionstime2-shell-v34";
+const CACHE_NAME = "questionstime2-shell-v35";
+const CACHE_PREFIX = "questionstime2-shell-"; // seuls ces caches sont gérés ici (IndexedDB jamais touché)
+
+// Mise à jour : la nouvelle version s'installe puis ATTEND (pas de
+// skipWaiting automatique). La page décide quand l'appliquer (Splash non
+// touché, ou bouton « Mettre à jour ») en envoyant { type: "SKIP_WAITING" }.
+self.addEventListener("message", (event) => {
+  const type = event.data?.type;
+  if (type === "SKIP_WAITING") self.skipWaiting();
+  if (type === "GET_VERSION") {
+    // Version du cache, affichée dans Paramètres > Infos (« Build v35 »).
+    const reply = CACHE_NAME.slice(CACHE_PREFIX.length);
+    if (event.ports?.[0]) event.ports[0].postMessage(reply);
+    else event.source?.postMessage({ type: "VERSION", version: reply });
+  }
+});
 
 // Fichiers indispensables au démarrage de l'app hors ligne.
 // Chemins relatifs : compatible avec un hébergement GitHub Pages
@@ -91,6 +106,7 @@ const APP_SHELL = [
   "./js/features/miniApps/chooser/chooserView.js",
   "./js/ui/navBar.js",
   "./js/ui/navConfig.js",
+  "./js/ui/updateBanner.js",
   "./data/questions.base.json",
 ];
 
@@ -98,8 +114,8 @@ self.addEventListener("install", (event) => {
   event.waitUntil(
     caches
       .open(CACHE_NAME)
-      .then((cache) => cache.addAll(APP_SHELL))
-      .then(() => self.skipWaiting())
+      // cache: "no-cache" : jamais une copie périmée du cache HTTP du navigateur.
+      .then((cache) => cache.addAll(APP_SHELL.map((url) => new Request(url, { cache: "no-cache" }))))
   );
 });
 
@@ -110,7 +126,7 @@ self.addEventListener("activate", (event) => {
       .then((names) =>
         Promise.all(
           names
-            .filter((name) => name !== CACHE_NAME)
+            .filter((name) => name.startsWith(CACHE_PREFIX) && name !== CACHE_NAME)
             .map((name) => caches.delete(name))
         )
       )
@@ -123,7 +139,10 @@ self.addEventListener("fetch", (event) => {
 
   // On ne gère que les requêtes GET de même origine.
   if (request.method !== "GET") return;
-  if (new URL(request.url).origin !== self.location.origin) return;
+  const url = new URL(request.url);
+  if (url.origin !== self.location.origin) return;
+  // Le service worker lui-même n'est jamais servi depuis un cache.
+  if (url.pathname.endsWith("/service-worker.js")) return;
 
   event.respondWith(networkFirst(request));
 });
@@ -137,7 +156,11 @@ async function networkFirst(request) {
   const cache = await caches.open(CACHE_NAME);
 
   try {
-    const response = await fetch(request);
+    // « no-cache » : le navigateur revalide auprès du serveur (GitHub Pages
+    // garde sinon les fichiers jusqu'à 10 min dans son cache HTTP).
+    const response = request.mode === "navigate"
+      ? await fetch(request.url, { cache: "no-cache", credentials: "same-origin" })
+      : await fetch(request, { cache: "no-cache" });
     if (response && response.ok) {
       cache.put(request, response.clone());
     }
