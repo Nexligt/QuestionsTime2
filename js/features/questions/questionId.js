@@ -17,13 +17,20 @@ export function formatQuestionId(id) {
 }
 
 /**
+ * ID saisi : « B-12 », « B - 12 », « b12 »… Le tiret peut être un trait
+ * d'union ou un tiret typographique (–, —, −) : les claviers de téléphone
+ * remplacent souvent « - » entouré d'espaces par « – ».
+ */
+export const QUESTION_ID_PATTERN = /^([BL])\s*[-\u2010-\u2015\u2212]?\s*(\d+)$/i;
+
+/**
  * Inverse de `formatQuestionId` (utilisé par la recherche par id).
- * @param {string} label - ex. "B-12", "b-12", "b12", "L-3" (casse et
- *   espaces autour du tiret ignorés).
+ * @param {string} label - ex. "B-12", "B - 12", "b12", "L – 3" (casse,
+ *   espaces et type de tiret ignorés).
  * @returns {number|null}
  */
 export function parseQuestionId(label) {
-  const match = /^([BL])\s*-?\s*(\d+)$/i.exec(String(label ?? "").trim());
+  const match = QUESTION_ID_PATTERN.exec(String(label ?? "").trim());
   if (!match) return null;
   const n = Number(match[2]);
   if (n === 0) return null;

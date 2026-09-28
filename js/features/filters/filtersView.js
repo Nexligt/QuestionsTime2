@@ -48,12 +48,16 @@ export function createFiltersView() {
   card.className = "card filters-card";
 
   const heading = document.createElement("h1");
+  heading.className = "page-title";
   heading.textContent = "Filtres";
 
   const help = document.createElement("p");
   help.className = "filters-help";
-  help.textContent =
-    "Touchez un tag pour changer son état : neutre → obligatoire → exclu.";
+  // Coupure propre à 320 px : « : » insécable, cycle des états d'un bloc.
+  const helpCycle = document.createElement("span");
+  helpCycle.className = "filters-help__cycle";
+  helpCycle.textContent = "neutre → obligatoire → exclu.";
+  help.append("Touchez un tag pour changer son état\u00a0: ", helpCycle);
 
   const summary = document.createElement("p");
   summary.className = "filters-summary";
@@ -104,8 +108,8 @@ export function createFiltersView() {
   // Taper une recherche rouvre la liste pour montrer les résultats.
   searchInput.addEventListener("input", () => setExpanded(true));
 
-  card.append(heading, help, summary, searchLabel, toggle, tagList);
-  view.append(card);
+  card.append(help, summary, searchLabel, toggle, tagList);
+  view.append(heading, card);
 
   wireFilters({ summary, searchInput, tagList, toggleLabel });
   return view;

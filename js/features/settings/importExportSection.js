@@ -18,8 +18,8 @@ import {
 import { formatQuestionId } from "../questions/questionId.js";
 
 const EXPORT_CHOICES = [
-  { value: "local", label: "Questions locales" },
-  { value: "base", label: "Questions de base modifiées" },
+  { value: "local", label: "Questions locales", short: "Locales" },
+  { value: "base", label: "Questions de base modifiées", short: "Base" },
   { value: "both", label: "Les deux" },
 ];
 
@@ -70,7 +70,7 @@ function buildExportPart(uid, exportCache, invalidateExport) {
   title.id = `io-export-title-${uid}`;
   title.textContent = "Exporter";
 
-  const scope = createRadioGroup(`io-export-scope-${uid}`, EXPORT_CHOICES, "both", title.id);
+  const scope = createRadioGroup(`io-export-scope-${uid}`, EXPORT_CHOICES, "both", title.id, { segmented: true });
   scope.root.classList.add("settings-io__scope");
 
   const actions = document.createElement("div");
@@ -184,8 +184,18 @@ function buildImportPart(uid, invalidateExport) {
 
   const analyzeButton = createButton("Analyser", "button button--secondary settings-io__analyze");
 
-  const mode = createRadioGroup(`io-import-mode-${uid}`, MODE_CHOICES, IMPORT_MODES.MERGE, title.id);
+  const mode = createRadioGroup(`io-import-mode-${uid}`, MODE_CHOICES, IMPORT_MODES.MERGE, title.id, { segmented: true });
   mode.root.classList.add("settings-io__mode");
+  // Description du mode choisi, affichée sous le sélecteur (les lecteurs
+  // d'écran l'entendent déjà dans le libellé de chaque option).
+  const modeHint = document.createElement("p");
+  modeHint.className = "settings-io__mode-hint";
+  modeHint.setAttribute("aria-hidden", "true");
+  const updateModeHint = () => {
+    modeHint.textContent = MODE_CHOICES.find((c) => c.value === mode.value())?.description ?? "";
+  };
+  updateModeHint();
+  mode.root.addEventListener("change", updateModeHint);
 
   const preview = document.createElement("div");
   preview.className = "settings-io__preview";
@@ -197,7 +207,7 @@ function buildImportPart(uid, invalidateExport) {
 
   const status = createStatus();
 
-  part.append(title, fileLabel, textarea, analyzeButton, mode.root, preview, confirmButton, status.el);
+  part.append(title, fileLabel, textarea, analyzeButton, mode.root, modeHint, preview, confirmButton, status.el);
 
   let report = null;
   let sourceText = "";
@@ -377,10 +387,15 @@ function createList(items, className, key) {
   return list;
 }
 
-/** Groupe radio compact (mêmes classes que les autres choix de Paramètres). */
-function createRadioGroup(name, choices, initial, labelledBy) {
+/**
+ * Groupe radio (mêmes classes que les autres choix de Paramètres).
+ * `segmented` : présentation en sélecteur à segments compact ; le libellé
+ * complet et la description restent lus par les lecteurs d'écran, le
+ * segment affiche `short` s'il existe.
+ */
+function createRadioGroup(name, choices, initial, labelledBy, { segmented = false } = {}) {
   const root = document.createElement("div");
-  root.className = "settings-choices";
+  root.className = segmented ? "settings-choices settings-segmented" : "settings-choices";
   root.setAttribute("role", "radiogroup");
   root.setAttribute("aria-labelledby", labelledBy);
   for (const choice of choices) {
@@ -398,9 +413,19 @@ function createRadioGroup(name, choices, initial, labelledBy) {
     optionName.className = "settings-choice__label";
     optionName.textContent = choice.label;
     text.append(optionName);
+    if (segmented && choice.short) {
+      optionName.classList.add("visually-hidden");
+      const short = document.createElement("span");
+      short.className = "settings-segmented__short";
+      short.setAttribute("aria-hidden", "true");
+      short.textContent = choice.short;
+      text.append(short);
+    }
     if (choice.description) {
       const description = document.createElement("span");
-      description.className = "settings-choice__description";
+      description.className = segmented
+        ? "settings-choice__description visually-hidden"
+        : "settings-choice__description";
       description.textContent = choice.description;
       text.append(description);
     }

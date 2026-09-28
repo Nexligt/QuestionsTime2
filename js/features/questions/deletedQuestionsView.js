@@ -31,7 +31,7 @@ export function createDeletedQuestionsView() {
   card.className = "card deleted-card";
 
   const heading = document.createElement("h1");
-  heading.className = "deleted-card__title";
+  heading.className = "page-title deleted-card__title";
   heading.textContent = "Questions supprimées";
 
   const help = document.createElement("p");
@@ -64,8 +64,8 @@ export function createDeletedQuestionsView() {
   topPager.root.classList.add("pager--top");
   bottomPager.root.classList.add("pager--bottom");
 
-  card.append(heading, help, searchLabel, status, topPager.root, list, bottomPager.root);
-  view.append(card);
+  card.append(help, searchLabel, status, topPager.root, list, bottomPager.root);
+  view.append(heading, card);
 
   let allQuestions = [];
   let page = 1;

@@ -48,16 +48,26 @@ body {
 }
 
 .splash__hint {
-  color: var(--color-text-muted);
+  /* Moins visible que le texte secondaire (couleur, pas opacité : le
+     fondu de sortie anime déjà l'opacité). Secours iOS < 16.2 :
+     --color-text-muted (#b8aecb) à 65 %. */
+  color: rgba(184, 174, 203, 0.65);
+  color: color-mix(in srgb, var(--color-text-muted) 65%, transparent);
 }
 
 .nav-item[aria-current="page"] {
   color: var(--color-accent);
 }
 
+/* Icônes de la barre du bas : contour seul, comme celles de Main. */
 .nav-item__icon svg {
-  fill: currentColor;
+  fill: none;
   stroke: currentColor;
+}
+
+/* Onglet actif : couleur + petit indicateur (barre au-dessus de l'icône). */
+.nav-item[aria-current="page"]::before {
+  background: currentColor;
 }
 
 .icon-button {
@@ -96,7 +106,7 @@ body {
 .filters-search__input {
   background: var(--color-bg);
   color: var(--color-text);
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--color-border-strong);
 }
 
 .filter-tag {
@@ -152,7 +162,7 @@ body {
 .settings-number__input {
   background: var(--color-bg);
   color: var(--color-text);
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--color-border-strong);
 }
 
 .settings-number__input[aria-invalid="true"] {
@@ -170,7 +180,7 @@ body {
 .question-form__input {
   background: var(--color-bg);
   color: var(--color-text);
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--color-border-strong);
 }
 
 .question-form__field--invalid .question-form__input {
@@ -258,7 +268,7 @@ body {
 .settings-io__textarea {
   background: var(--color-bg);
   color: var(--color-text);
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--color-border-strong);
 }
 
 .settings-io__preview {
@@ -291,4 +301,186 @@ body {
 
 .splash-intro__shadow {
   background: radial-gradient(closest-side, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0));
+}
+
+/* Champs de saisie : texte indicatif lisible (Formulaire, Filtres,
+   Supprimées, Import, intervalle Libre). */
+.filters-search__input::placeholder,
+.settings-number__input::placeholder,
+.question-form__input::placeholder,
+.settings-io__textarea::placeholder {
+  color: var(--color-placeholder);
+  opacity: 1;
+}
+
+/* Sélecteurs à segments (Import / Export) */
+.settings-segmented {
+  background: var(--color-bg);
+  border: 1px solid var(--color-border-strong);
+}
+
+.settings-segmented .settings-choice {
+  color: var(--color-text-muted);
+}
+
+.settings-segmented .settings-choice:has(.settings-choice__input:checked) {
+  background: var(--color-accent);
+  color: var(--color-accent-text);
+}
+
+.settings-io__mode-hint {
+  color: var(--color-text-muted);
+}
+
+/* Mini-application « Dés » */
+.die__body {
+  fill: var(--color-surface-2);
+  stroke: var(--color-accent);
+}
+
+.die__pip,
+.die__value {
+  fill: var(--color-text);
+}
+
+.dice-roll {
+  background: rgba(0, 0, 0, 0.7); /* secours iOS < 16.2 : --color-shade (#000) à 70 % */
+  background: color-mix(in srgb, var(--color-shade) 70%, transparent);
+}
+
+.dice-roll__hint {
+  color: var(--color-text-muted);
+}
+
+.question-form__summary[data-status="success"] {
+  color: var(--color-accent);
+}
+
+.question-form__load-status {
+  color: var(--color-text-muted);
+}
+
+.question-form__load-status a {
+  color: var(--color-accent);
+}
+
+/* Recherche d'une question (Main) */
+.question-search {
+  background: rgba(32, 25, 49, 0.97); /* secours iOS < 16.2 : --color-bg à 97 % */
+  background: color-mix(in srgb, var(--color-bg) 97%, transparent);
+}
+
+.question-search__status,
+.question-search__id {
+  color: var(--color-text-muted);
+}
+
+.question-search__item {
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+}
+
+.settings-install__hint {
+  color: var(--color-text-muted);
+}
+
+/* Mini-application « Roue » : couleurs alternées des parts */
+.wheel__part {
+  stroke: var(--color-bg);
+}
+
+.wheel__slice--a .wheel__part { fill: var(--color-accent); }
+.wheel__slice--a .wheel__label { fill: var(--color-accent-text); }
+.wheel__slice--b .wheel__part { fill: var(--color-surface-2); }
+.wheel__slice--b .wheel__label { fill: var(--color-text); }
+.wheel__slice--c .wheel__part { fill: var(--color-border-strong); }
+.wheel__slice--c .wheel__label { fill: var(--color-text); }
+
+.wheel__hub {
+  fill: var(--color-bg);
+  stroke: var(--color-accent);
+  stroke-width: 2;
+}
+
+.wheel-app__pointer {
+  background: var(--color-text);
+}
+
+.wheel-app__drawn-status {
+  color: var(--color-text-muted);
+}
+
+/* Menu des mini-applications */
+.miniapps-tile {
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+}
+
+.miniapps-tile:active {
+  border-color: var(--color-accent);
+}
+
+.miniapps-tile__logo {
+  color: var(--color-accent);
+}
+
+/* Pile ou face */
+.coin__body { fill: var(--color-accent); }
+.coin__rim,
+.coin__motif--ring { stroke: var(--color-accent-text); }
+.coin__motif,
+.coin__label { fill: var(--color-accent-text); }
+.coin__motif--ring { fill: none; }
+
+/* Équipes : une couleur distincte par équipe (bandeau + titre) */
+.teams-card { background: var(--color-surface-2); color: var(--color-text); }
+.teams-card--0 { border-top-color: var(--color-accent); }
+.teams-card--1 { border-top-color: var(--color-danger); }
+.teams-card--2 { border-top-color: var(--color-border-strong); }
+.teams-card--3 { border-top-color: var(--color-text); }
+.teams-card--4 { border-top-color: var(--color-text-muted); }
+.teams-card--5 { border-top-color: var(--color-placeholder); }
+.teams-card--0 .teams-card__title { color: var(--color-accent); }
+.teams-card--1 .teams-card__title { color: var(--color-danger); }
+.teams-card--2 .teams-card__title { color: var(--color-border-strong); }
+.teams-card--3 .teams-card__title { color: var(--color-text); }
+.teams-card--4 .teams-card__title { color: var(--color-text-muted); }
+.teams-card--5 .teams-card__title { color: var(--color-placeholder); }
+.teams-app__status { color: var(--color-danger); }
+
+/* Sablier */
+.hourglass__glass { stroke: var(--color-text-muted); }
+.hourglass__frame { fill: var(--color-border-strong); }
+.hourglass__sand { fill: var(--color-accent); }
+.hourglass__stream { stroke: var(--color-accent); }
+.timer-app__bar { background: var(--color-surface-2); }
+.timer-app__bar-fill { background: var(--color-accent); }
+.timer-app__end,
+.timer-app--done .timer-app__time { color: var(--color-accent); }
+.timer-app--done .timer-app__visual { background: var(--color-surface-2); }
+
+/* Qui commence ? : une couleur par doigt, fond du gagnant */
+.chooser { background: var(--color-bg); color: var(--color-text); }
+.chooser__ring circle { stroke: var(--color-text); }
+.chooser__circle--0 .chooser__dot { background: var(--color-accent); }
+.chooser--win-0 { background: color-mix(in srgb, var(--color-accent) 45%, var(--color-bg)); }
+.chooser__circle--1 .chooser__dot { background: var(--color-danger); }
+.chooser--win-1 { background: color-mix(in srgb, var(--color-danger) 45%, var(--color-bg)); }
+.chooser__circle--2 .chooser__dot { background: var(--color-border-strong); }
+.chooser--win-2 { background: color-mix(in srgb, var(--color-border-strong) 45%, var(--color-bg)); }
+.chooser__circle--3 .chooser__dot { background: var(--color-text); }
+.chooser--win-3 { background: color-mix(in srgb, var(--color-text) 45%, var(--color-bg)); }
+.chooser__circle--4 .chooser__dot { background: var(--color-placeholder); }
+.chooser--win-4 { background: color-mix(in srgb, var(--color-placeholder) 45%, var(--color-bg)); }
+.chooser__circle--5 .chooser__dot { background: var(--color-text-muted); }
+.chooser--win-5 { background: color-mix(in srgb, var(--color-text-muted) 45%, var(--color-bg)); }
+@supports not (background: color-mix(in srgb, red 50%, blue)) {
+  .chooser--win-0 { background: var(--color-accent); }
+  .chooser--win-1 { background: var(--color-danger); }
+  .chooser--win-2 { background: var(--color-border-strong); }
+  .chooser--win-3 { background: var(--color-text); }
+  .chooser--win-4 { background: var(--color-placeholder); }
+  .chooser--win-5 { background: var(--color-text-muted); }
 }

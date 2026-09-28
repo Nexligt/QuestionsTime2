@@ -9,7 +9,7 @@ import { waitFor, mainIsReady, displayedQuestionId, BASE_QUESTIONS } from "./hel
 import { openDatabase, STORES } from "../js/data/db.js";
 import {
   createLocalQuestion, getLocalQuestions, getBaseQuestions, getAvailableQuestions,
-  getBaseQuestionOverrides, saveBaseQuestionOverride, getLocalEdits,
+  getBaseQuestionOverrides, saveBaseQuestionOverride,
 } from "../js/data/questionsRepository.js";
 import { getHistory, recordQuestionViewed } from "../js/data/historyRepository.js";
 import { getSetting, setSetting } from "../js/data/settingsRepository.js";
@@ -64,7 +64,6 @@ async function snapshot() {
     mode: await getSetting(SELECTION_MODE_KEY, "strict"),
     filters: await getTagFilterStates(),
     locals: await getLocalQuestions(),
-    edits: await getLocalEdits(),
   };
 }
 

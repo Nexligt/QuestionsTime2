@@ -28,7 +28,10 @@ import {
 } from "../questions/questionEngine.js";
 import { SELECTION_MODES } from "../questions/questionSelection.js";
 import { buildInfoSection } from "./infoSection.js";
+import { buildInstallInvite } from "./installInvite.js";
 import { buildImportExportSection } from "./importExportSection.js";
+import { createMiniAppsPanel } from "../miniApps/miniAppsMenu.js";
+import { replaceHash } from "../../core/router.js";
 import {
   NEXT_NAVIGATION,
   DEFAULT_NEXT_NAVIGATION,
@@ -101,29 +104,43 @@ const SETTINGS_TABS = [
     id: "mini-apps",
     label: "Mini-applications",
     shortLabel: "Mini-apps", // libellé affiché (tient sur une ligne dès 320 px)
-    sections: [{ id: "mini-apps", title: "Mini-applications", build: buildMiniAppsPlaceholder }],
+    // Menu de tuiles, une par mini-application (js/features/miniApps/miniAppsMenu.js).
+    sections: [],
+    miniApps: true,
   },
   {
     id: "informations",
     label: "Informations",
     shortLabel: "Infos",
-    sections: [{ id: "informations", title: "Informations", build: buildInfoSection }],
+    sections: [{ id: "informations", title: "Informations", build: buildInformations }],
   },
 ];
 
 let settingsViewCounter = 0;
 
+/** Contrôleurs des vues affichées (sous-adresse #/settings/…). */
+const subRouteHandlers = new WeakMap();
+
+/**
+ * Sous-adresse sur la vue déjà affichée (router : `update`) :
+ * « miniapps » -> onglet Mini-apps (menu) ; « miniapps/<id> » -> application ;
+ * vide -> onglet par défaut.
+ */
+export function updateSettingsView(element, subRoute) {
+  subRouteHandlers.get(element)?.(subRoute);
+}
+
 /**
  * Construit la vue Paramètres (rendu synchrone, valeurs chargées ensuite).
  * @returns {HTMLElement}
  */
-export function createSettingsView() {
+export function createSettingsView(subRoute = "") {
   const uid = ++settingsViewCounter;
   const view = document.createElement("div");
   view.className = "view view--settings";
 
   const heading = document.createElement("h1");
-  heading.className = "settings-title";
+  heading.className = "page-title settings-title";
   heading.textContent = "Paramètres";
 
   const tabList = document.createElement("div");
@@ -132,6 +149,19 @@ export function createSettingsView() {
   tabList.setAttribute("aria-label", "Rubriques des paramètres");
 
   view.append(heading, tabList);
+
+  const miniApps = createMiniAppsPanel();
+
+  // Onglet choisi à la main : l'adresse suit sans nouvelle entrée
+  // d'historique (retour du téléphone : page précédente, pas l'onglet).
+  function syncHash(tabId) {
+    const loc = view.ownerDocument.defaultView?.location;
+    if (!loc?.hash.startsWith("#/settings")) return;
+    const target = tabId === "mini-apps"
+      ? `#/settings/miniapps${miniApps.current() ? `/${miniApps.current()}` : ""}`
+      : `#/settings/${tabId}`;
+    replaceHash(target, view.ownerDocument.defaultView);
+  }
 
   const tabs = [];
   for (const tabDef of SETTINGS_TABS) {
@@ -157,8 +187,12 @@ export function createSettingsView() {
     for (const section of tabDef.sections) {
       panel.append(buildSection(section, { collapsible: Boolean(tabDef.collapsible) }));
     }
+    if (tabDef.miniApps) panel.append(miniApps.root);
 
-    tab.addEventListener("click", () => selectTab(tabDef.id));
+    tab.addEventListener("click", () => {
+      selectTab(tabDef.id);
+      syncHash(tabDef.id);
+    });
     tabList.append(tab);
     view.append(panel);
     tabs.push({ id: tabDef.id, tab, panel });
@@ -184,7 +218,21 @@ export function createSettingsView() {
     event.preventDefault();
   });
 
-  selectTab(SETTINGS_TABS[0].id); // "Réglages" par défaut
+  function applySubRoute(route) {
+    const [section, appId] = String(route ?? "").split("/"); // « /play » éventuel ignoré (couche d'une mini-app)
+    if (section === "miniapps") {
+      selectTab("mini-apps");
+      miniApps.show(appId || null);
+    } else if (SETTINGS_TABS.some((t) => t.id === section)) {
+      miniApps.show(null);
+      selectTab(section); // #/settings/informations, #/settings/reglages
+    } else {
+      miniApps.show(null);
+      selectTab(SETTINGS_TABS[0].id); // "Réglages" par défaut
+    }
+  }
+  subRouteHandlers.set(view, applySubRoute);
+  applySubRoute(subRoute);
   return view;
 }
 
@@ -251,12 +299,12 @@ function buildSection(section, { collapsible = false } = {}) {
   return card;
 }
 
-/** Onglet "Mini-applications" : aucune pour l'instant (générateur de dés à venir). */
-function buildMiniAppsPlaceholder() {
-  const message = document.createElement("p");
-  message.className = "settings-choice__description settings-empty";
-  message.textContent = "Aucune mini-application disponible pour le moment.";
-  return message;
+/** Informations + invitation (discrète) à installer l'application. */
+function buildInformations(labelledBy) {
+  const wrapper = document.createElement("div");
+  wrapper.className = "settings-informations";
+  wrapper.append(buildInfoSection(labelledBy), buildInstallInvite());
+  return wrapper;
 }
 
 /**

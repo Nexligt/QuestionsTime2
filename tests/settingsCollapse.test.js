@@ -56,11 +56,11 @@ test("les réglages fonctionnent toujours une fois la carte dépliée", async ()
 
 test("Informations et Mini-applications ne sont pas repliables", async () => {
   const v = await mountSettings();
-  for (const id of ["informations", "mini-apps"]) {
-    const section = v.querySelector(`[data-setting="${id}"]`);
-    assert.equal(section.querySelector(".settings-section__toggle"), null, id);
-    assert.equal(section.classList.contains("settings-section--collapsible"), false);
-  }
+  const section = v.querySelector('[data-setting="informations"]');
+  assert.equal(section.querySelector(".settings-section__toggle"), null);
+  assert.equal(section.classList.contains("settings-section--collapsible"), false);
+  // Mini-apps : menu de tuiles, aucune carte repliable.
+  assert.equal(v.querySelector('[data-panel="mini-apps"] .settings-section--collapsible'), null);
 });
 
 test("CSS : animation de hauteur (0fr -> 1fr), chevron, mouvement réduit respecté", () => {

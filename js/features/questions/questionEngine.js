@@ -276,6 +276,25 @@ async function resolveCurrentQuestion(availableQuestions) {
 }
 
 /**
+ * Affiche une question CHOISIE par l'utilisateur (recherche depuis Main) :
+ * elle devient la question courante et est enregistrée dans l'historique
+ * du mode courant, comme une question affichée par « Suivante ».
+ * @param {Array<{id:number}>} availableQuestions - questions compatibles (filtres appliqués).
+ * @param {number} id
+ * @returns {Promise<{status:string, question:object}>}
+ */
+export async function showQuestion(availableQuestions, id) {
+  return runExclusive(async () => {
+    const question = (availableQuestions ?? []).find((q) => q.id === id);
+    if (!question) throw new Error(`[questionEngine] Question indisponible (id ${id}).`);
+    const mode = await getSetting(SELECTION_MODE_KEY, DEFAULT_SELECTION_MODE);
+    await recordQuestionViewed(question.id, mode);
+    await setSetting(CURRENT_QUESTION_ID_KEY, question.id);
+    return { status: SELECTION_STATUS.SELECTED, question };
+  });
+}
+
+/**
  * À appeler uniquement depuis une action explicite de l'utilisateur
  * (bouton "Suivante", plus tard le swipe) : déclenche toujours une
  * nouvelle sélection, jamais depuis un simple remontage de Main.

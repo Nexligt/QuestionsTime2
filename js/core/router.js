@@ -17,7 +17,11 @@ let currentViewName = null;
 /**
  * Enregistre une vue.
  * @param {string} name - identifiant de la vue (ex. "home").
- * @param {{ render: () => HTMLElement, showBottomNav?: boolean }} view
+ * Sous-adresse (ex. #/settings/miniapps/dice) : `render` la lit avec
+ * getSubRoute() ; si la vue fournit `update(element, subRoute)`, un
+ * changement de sous-adresse sur la même vue l'appelle au lieu de tout
+ * reconstruire (le bouton retour du téléphone reste dans la vue).
+ * @param {{ render: () => HTMLElement, update?: (element: HTMLElement, subRoute: string) => void, showBottomNav?: boolean }} view
  */
 export function registerView(name, view) {
   views.set(name, view);
@@ -35,6 +39,28 @@ export function navigateTo(name) {
   window.location.hash = `#/${name}`;
 }
 
+let currentSubRoute = "";
+let currentElement = null;
+
+/**
+ * Remplace l'adresse sans nouvelle entrée d'historique (ni nouveau rendu
+ * si possible). Repli sur location.replace si replaceState est refusé.
+ * @param {string} hash - ex. "#/settings/miniapps"
+ */
+export function replaceHash(hash, win = window) {
+  if (win.location.hash === hash) return;
+  try {
+    win.history.replaceState(win.history.state, "", hash);
+  } catch {
+    win.location.replace(hash);
+  }
+}
+
+/** Sous-adresse de la vue affichée (« miniapps/dice » pour #/settings/miniapps/dice). */
+export function getSubRoute() {
+  return currentSubRoute;
+}
+
 function renderCurrentView() {
   const root = document.getElementById("view-root");
   const bottomNav = document.getElementById("bottom-nav");
@@ -47,7 +73,8 @@ function renderCurrentView() {
   }
 
   root.innerHTML = "";
-  root.append(view.render());
+  currentElement = view.render();
+  root.append(currentElement);
 
   const showNav = Boolean(view.showBottomNav);
   bottomNav.hidden = !showNav;
@@ -81,7 +108,18 @@ export function onViewChange(callback) {
 export function initRouter(defaultView) {
   function handleHashChange() {
     const hash = window.location.hash.replace(/^#\/?/, "");
-    currentViewName = hash || defaultView;
+    const [name, ...rest] = hash.split("/");
+    const viewName = name || defaultView;
+    const subRoute = rest.join("/");
+    const view = views.get(viewName);
+    // Même vue, autre sous-adresse : mise à jour sans reconstruction.
+    if (viewName === currentViewName && view?.update && currentElement?.isConnected) {
+      currentSubRoute = subRoute;
+      view.update(currentElement, subRoute);
+      return;
+    }
+    currentViewName = viewName;
+    currentSubRoute = subRoute;
     renderCurrentView();
   }
 

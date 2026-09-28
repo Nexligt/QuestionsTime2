@@ -23,25 +23,20 @@
   ensuite ce même repository pour afficher une vraie question.
 */
 
-import { registerView, initRouter, navigateTo } from "./core/router.js";
-import { registerServiceWorker, isRunningStandalone } from "./core/pwa.js";
+import { registerView, initRouter, navigateTo, getSubRoute } from "./core/router.js";
+import { registerServiceWorker, isRunningStandalone, initInstallPrompt } from "./core/pwa.js";
 import { initBottomNav } from "./ui/navBar.js";
 import { startSplashIntro } from "./ui/splashIntro.js";
 import { openDatabase } from "./data/db.js";
 import { getBaseQuestions } from "./data/questionsRepository.js";
-import { setSetting } from "./data/settingsRepository.js";
 import { createMainView } from "./features/questions/mainView.js";
 import { createFiltersView } from "./features/filters/filtersView.js";
-import { createSettingsView } from "./features/settings/settingsView.js";
+import { createSettingsView, updateSettingsView } from "./features/settings/settingsView.js";
 import { createDeletedQuestionsView } from "./features/questions/deletedQuestionsView.js";
 import {
   createQuestionFormView,
   createQuestionEditView,
 } from "./features/questions/questionFormView.js";
-import {
-  SELECTION_MODE_KEY,
-  RECENT_QUESTION_COUNT_KEY,
-} from "./features/questions/questionEngine.js";
 
 /** Crée une vue placeholder simple, pour valider le socle. */
 function createPlaceholderView(title, description) {
@@ -81,7 +76,8 @@ registerView("deleted-questions", {
 
 registerView("settings", {
   showBottomNav: true,
-  render: createSettingsView,
+  render: () => createSettingsView(getSubRoute()),
+  update: updateSettingsView, // #/settings/miniapps/<id> : retour du téléphone dans la page
 });
 
 // Création d'une question locale (bouton "+" de Main). La modification
@@ -128,31 +124,15 @@ async function initDataLayer() {
   }
 }
 
-/**
- * Aide TEMPORAIRE pour tester le mode Libre et la taille de
- * l'historique récent depuis la console du navigateur, en attendant
- * que l'écran Paramètres existe pour les régler graphiquement. Écrit
- * dans le même store `settings` que lira Paramètres plus tard — pas de
- * deuxième source de vérité. À retirer une fois Paramètres implémenté.
- *
- * Exemple dans la console :
- *   await window.__qt2.setSelectionMode("libre")
- *   await window.__qt2.setRecentQuestionCount(2)
- * Puis recharger #/main (ou y retourner via "Accueil").
- */
-function exposeTemporaryDebugHelpers() {
-  window.__qt2 = {
-    setSelectionMode: (mode) => setSetting(SELECTION_MODE_KEY, mode),
-    setRecentQuestionCount: (count) =>
-      setSetting(RECENT_QUESTION_COUNT_KEY, count),
-  };
-}
+// Invitation à installer : l'événement du navigateur peut arriver très tôt,
+// il est donc écouté dès le chargement du module (aucune fenêtre ouverte
+// d'elle-même : seul le bouton de Paramètres > Infos la déclenche).
+initInstallPrompt();
 
 async function bootstrap() {
   await initDataLayer();
   await registerServiceWorker();
   await initBottomNav(document.getElementById("bottom-nav"));
-  exposeTemporaryDebugHelpers();
 
   if (isRunningStandalone()) {
     document.documentElement.dataset.standalone = "true";

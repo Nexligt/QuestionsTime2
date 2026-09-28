@@ -5,7 +5,7 @@
 */
 
 .card {
-  border-radius: 1rem;
+  border-radius: var(--radius-lg);
   padding: var(--space-300);
 }
 
@@ -13,10 +13,10 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: var(--tap-size);
+  min-height: var(--tap-size-min);
   padding-inline: var(--space-300);
   border: none;
-  border-radius: 0.75rem;
+  border-radius: var(--radius-md);
   font-size: var(--fs-md);
   font-weight: 600;
   cursor: pointer;
@@ -25,24 +25,32 @@
 /* Écran Main : titre en tête de page (pas celui du splash, mais le
    même point d'accroche `#img-titre` — voir js/features/questions/mainView.js). */
 .main-header {
+  padding-top: var(--space-300); /* titre un peu plus bas */
   text-align: center;
 }
 
 .app-title {
   margin: 0;
-  font-size: var(--fs-400);
+}
+
+/* Mode + actions, en tête du bloc centré (au-dessus de la carte). */
+.main-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-200);
 }
 
 .mode-indicator {
   display: inline-flex;
-  margin: var(--space-100) auto 0;
-  padding: 0.15rem 0.75rem;
-  border-radius: 999px;
+  margin: 0;
+  padding: 0 var(--space-200);
+  border-radius: var(--radius-pill);
   font-size: var(--fs-sm);
   font-weight: 600;
   letter-spacing: 0.02em;
-  /* Bouton (bascule Strict/Libre) : zone tactile confortable. */
-  min-height: 2.25rem;
+  /* Bouton (bascule Strict/Libre) : zone tactile de 44 px minimum. */
+  min-height: var(--tap-size-min);
   align-items: center;
   font-family: inherit;
   cursor: pointer;
@@ -59,11 +67,11 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: var(--tap-size);
-  height: var(--tap-size);
+  width: var(--tap-size-min);
+  height: var(--tap-size-min);
   padding: 0;
   border: 1px solid var(--color-border);
-  border-radius: 0.75rem;
+  border-radius: var(--radius-md);
   cursor: pointer;
 }
 
@@ -125,8 +133,8 @@
 
 .tag-chip {
   font-size: var(--fs-xs);
-  padding: 0.25rem 0.75rem;
-  border-radius: 999px;
+  padding: var(--space-50) var(--space-200);
+  border-radius: var(--radius-pill);
   border: 1px solid var(--color-border);
 }
 
@@ -134,12 +142,12 @@
 .question-card__hints {
   text-align: left;
   margin: 0;
-  padding-left: 1.25rem;
+  padding-left: var(--space-400);
   font-size: var(--fs-sm);
 }
 
 .question-card__hints li {
-  margin-bottom: 0.25rem;
+  margin-bottom: var(--space-50);
 }
 
 .question-next {
@@ -162,7 +170,6 @@
   gap: var(--space-200);
 }
 
-.filters-card h1,
 .filters-help,
 .filters-summary {
   margin: 0;
@@ -173,11 +180,15 @@
   font-size: var(--fs-sm);
 }
 
+.filters-help__cycle {
+  white-space: nowrap;
+}
+
 .filters-search__input {
   width: 100%;
-  min-height: var(--tap-size);
+  min-height: var(--tap-size-min);
   padding-inline: var(--space-300);
-  border-radius: 0.75rem;
+  border-radius: var(--radius-md);
   font: inherit;
 }
 
@@ -262,11 +273,17 @@
   transform: translate(-50%, -50%) rotate(-45deg);
 }
 
-/* Écran Paramètres (js/features/settings/settingsView.js) */
-.settings-title {
+/* En-tête de page commun (Filtres, Supprimées, Paramètres, Formulaire) :
+   titre hors de la carte, même police, taille, alignement et espacement.
+   (Le titre de l'app sur Main n'est pas concerné.) */
+.page-title {
   margin: 0;
-  text-align: center;
-  font-size: var(--fs-xl);
+  font-family: var(--font-system);
+  font-size: var(--fs-xl); /* 20 px */
+  font-weight: 700;
+  line-height: var(--lh-tight);
+  text-align: left;
+  overflow-wrap: anywhere;
 }
 
 .settings-section {
@@ -276,7 +293,7 @@
 
 .settings-section__title {
   margin: 0;
-  font-family: var(--font-body);
+  font-family: var(--font-system);
   font-size: var(--fs-lg);
   font-weight: 600;
 }
@@ -290,9 +307,9 @@
   display: flex;
   align-items: center;
   gap: var(--space-100);
-  min-height: var(--tap-size);
+  min-height: var(--tap-size-min);
   padding: var(--space-100) var(--space-200);
-  border-radius: 0.75rem;
+  border-radius: var(--radius-md);
   cursor: pointer;
 }
 
@@ -305,7 +322,7 @@
 
 .settings-choice__text {
   display: grid;
-  gap: 0.1rem;
+  gap: var(--space-50);
 }
 
 .settings-choice__label {
@@ -392,9 +409,9 @@
 
 .settings-number__input {
   width: 100%;
-  min-height: var(--tap-size);
+  min-height: var(--tap-size-min);
   padding-inline: var(--space-300);
-  border-radius: 0.75rem;
+  border-radius: var(--radius-md);
   font: inherit;
   font-size: var(--fs-lg);
 }
@@ -412,11 +429,6 @@
 .question-form {
   display: grid;
   gap: var(--space-300);
-}
-
-.question-form__title {
-  margin: 0;
-  font-size: var(--fs-xl);
 }
 
 .question-form__summary,
@@ -447,9 +459,9 @@
 
 .question-form__input {
   width: 100%;
-  min-height: var(--tap-size);
+  min-height: var(--tap-size-min);
   padding: var(--space-100) var(--space-300);
-  border-radius: 0.75rem;
+  border-radius: var(--radius-md);
   font: inherit;
 }
 
@@ -482,7 +494,7 @@
 
 .question-form__tag,
 .question-form__suggestion {
-  min-height: 2.5rem;
+  min-height: var(--tap-size-min); /* 44 px */
   font: inherit;
   font-size: var(--fs-sm);
   cursor: pointer;
@@ -505,9 +517,9 @@
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  min-height: var(--tap-size);
+  min-height: var(--tap-size-min);
   padding-inline: var(--space-300);
-  border-radius: 0.75rem;
+  border-radius: var(--radius-md);
   font: inherit;
   font-weight: 600;
   cursor: pointer;
@@ -558,6 +570,7 @@
 .delete-confirm {
   display: grid;
   gap: var(--space-200);
+  box-shadow: var(--shadow-overlay);
 }
 
 .delete-confirm[hidden] {
@@ -591,7 +604,6 @@
   gap: var(--space-200);
 }
 
-.deleted-card__title,
 .deleted-card__help,
 .deleted-card__status {
   margin: 0;
@@ -621,9 +633,9 @@
     "id restore"
     "text restore";
   align-items: center;
-  gap: 0.25rem var(--space-200);
+  gap: var(--space-50) var(--space-200);
   padding: var(--space-200) var(--space-300);
-  border-radius: 0.75rem;
+  border-radius: var(--radius-md);
 }
 
 .deleted-item__id {
@@ -698,7 +710,7 @@
 
 .pager .button {
   min-width: 0;
-  min-height: 2.5rem;
+  min-height: var(--tap-size-min); /* 44 px */
   padding-inline: var(--space-200);
   white-space: nowrap;
 }
@@ -726,7 +738,7 @@
   justify-content: space-between;
   align-items: baseline;
   gap: var(--space-200);
-  padding-block: 0.35rem;
+  padding-block: var(--space-50);
 }
 
 .settings-info__label,
@@ -744,20 +756,20 @@
 .settings-tabs {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0.25rem;
-  padding: 0.25rem;
-  border-radius: 0.9rem;
+  gap: var(--space-50);
+  padding: var(--space-50);
+  border-radius: var(--radius-lg);
 }
 
 .settings-tab {
-  min-height: var(--tap-size);
-  padding: 0.25rem 0.4rem;
+  min-height: var(--tap-size-min);
+  padding: var(--space-50) var(--space-100);
   border: none;
-  border-radius: 0.7rem;
+  border-radius: var(--radius-md);
   font: inherit;
   font-size: var(--fs-sm);
   font-weight: 600;
-  line-height: 1.15;
+  line-height: var(--lh-tight);
   cursor: pointer;
   /* Jamais de coupure au milieu d'un mot : libellés courts, sur une ligne. */
   min-width: 0;
@@ -796,7 +808,7 @@
 
 .settings-io__title {
   margin: 0;
-  font-family: var(--font-body);
+  font-family: var(--font-system);
   font-size: var(--fs-md);
   font-weight: 600;
 }
@@ -822,7 +834,7 @@
   width: 100%;
   min-height: 5.5rem;
   padding: var(--space-100) var(--space-200);
-  border-radius: 0.75rem;
+  border-radius: var(--radius-md);
   font: inherit;
   font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
   font-size: var(--fs-sm);
@@ -839,7 +851,7 @@
   display: grid;
   gap: var(--space-100);
   padding: var(--space-200) var(--space-300);
-  border-radius: 0.75rem;
+  border-radius: var(--radius-md);
   font-size: var(--fs-sm);
 }
 
@@ -857,9 +869,9 @@
 .settings-io__warnings,
 .settings-io__errors {
   margin: 0;
-  padding-left: 1.1rem;
+  padding-left: var(--space-300);
   display: grid;
-  gap: 0.2rem;
+  gap: var(--space-50);
 }
 
 .settings-io__status {
@@ -882,7 +894,7 @@
   justify-content: space-between;
   gap: var(--space-200);
   width: 100%;
-  min-height: var(--tap-size);
+  min-height: var(--tap-size-min);
   padding: 0;
   border: none;
   background: transparent;
@@ -940,5 +952,975 @@
   .settings-section__body,
   .settings-section__toggle::after {
     transition: none !important;
+  }
+}
+
+/* Import / Export : sélecteurs à segments compacts (« Locales / Base /
+   Les deux », « Fusionner / Remplacer »). Mêmes boutons radio natifs,
+   rendus invisibles mais couvrant tout le segment (clic, clavier, focus). */
+.settings-segmented {
+  display: flex; /* largeur selon le libellé, puis partage de la place restante */
+  gap: var(--space-50);
+  padding: var(--space-50);
+  border-radius: var(--radius-lg);
+}
+
+.settings-segmented .settings-choice {
+  position: relative;
+  flex: 1 1 auto;
+  justify-content: center;
+  min-width: 0;
+  padding: var(--space-50) var(--space-100);
+  border: none;
+  border-radius: var(--radius-md);
+  text-align: center;
+}
+
+.settings-segmented .settings-choice__input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.settings-segmented .settings-choice__text {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  line-height: var(--lh-tight);
+}
+
+.settings-segmented .settings-choice:has(.settings-choice__input:focus-visible) {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.settings-io__mode-hint {
+  margin: 0;
+  font-size: var(--fs-sm);
+}
+
+/* Mini-application « Dés » (js/features/miniApps/dice/) */
+.dice-app {
+  display: grid;
+  gap: var(--space-300);
+}
+
+.dice-app__faces {
+  display: grid;
+  gap: var(--space-100);
+}
+
+.dice-app__label {
+  margin: 0;
+}
+
+.dice-app__other {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 6rem;
+  align-items: center;
+  gap: var(--space-200);
+  font-size: var(--fs-sm);
+}
+
+.dice-app__roll {
+  width: 100%;
+  min-height: var(--tap-size-primary);
+}
+
+.dice-app__results {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-200);
+}
+
+.dice-app__results[hidden] {
+  display: none;
+}
+
+.dice-app__dice {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-100);
+  margin: 0;
+  padding: 0;
+}
+
+.dice-app__total {
+  margin: 0;
+  font-size: var(--fs-lg);
+  font-weight: 700;
+}
+
+.die {
+  display: inline-block;
+  width: var(--tap-size-min);
+  height: var(--tap-size-min);
+}
+
+.die svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.die__body {
+  stroke-width: 4;
+  stroke-linejoin: round;
+}
+
+.die__value {
+  font-family: var(--font-system);
+  font-weight: 700;
+}
+
+/* Lancer animé : couche temporaire au premier plan. */
+.dice-roll {
+  position: fixed;
+  inset: 0;
+  z-index: 110;
+  display: grid;
+  place-items: center;
+  padding: var(--space-400) var(--space-300);
+  cursor: pointer;
+  touch-action: none;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.dice-roll__tray {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-300);
+  max-width: 24rem;
+}
+
+.dice-roll__die {
+  width: 4rem;
+  height: 4rem;
+  will-change: transform;
+}
+
+.dice-roll__hint {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: calc(var(--space-500) + var(--safe-bottom));
+  margin: 0;
+  font-size: var(--fs-xs);
+  text-align: center;
+}
+
+/* Formulaire : charger une question par son ID, restaurer l'original */
+.question-form__load {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-200);
+}
+
+.question-form__load-label {
+  font-weight: 600;
+}
+
+.question-form__load-status,
+.question-form__restore-message {
+  margin: 0;
+  font-size: var(--fs-sm);
+}
+
+.question-form__load-status:empty,
+.question-form__restore[hidden],
+.question-form__restore-confirm[hidden] {
+  display: none;
+}
+
+.question-form__restore-confirm {
+  display: grid;
+  gap: var(--space-200);
+}
+
+/* Recherche d'une question depuis Main : couche par-dessus la page. */
+.question-search {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-200);
+  padding: calc(var(--space-300) + env(safe-area-inset-top, 0px)) var(--space-300) calc(var(--space-300) + var(--safe-bottom));
+}
+
+.question-search__bar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--space-200);
+  width: 100%;
+  max-width: 32rem;
+  margin-inline: auto;
+}
+
+.question-search__status {
+  width: 100%;
+  max-width: 32rem;
+  margin: 0 auto;
+  font-size: var(--fs-sm);
+}
+
+.question-search__list {
+  flex: 1 1 auto;
+  display: grid;
+  align-content: start;
+  gap: var(--space-100);
+  width: 100%;
+  max-width: 32rem;
+  margin: 0 auto;
+  padding: 0;
+  list-style: none;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.question-search__item {
+  display: grid;
+  gap: var(--space-50);
+  width: 100%;
+  min-height: var(--tap-size-min);
+  padding: var(--space-200) var(--space-300);
+  border-radius: var(--radius-md);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.question-search__id {
+  font-size: var(--fs-xs);
+  font-weight: 600;
+}
+
+.question-search__text {
+  overflow-wrap: anywhere;
+}
+
+/* Paramètres > Infos : informations + invitation à installer */
+.settings-informations {
+  display: grid;
+  gap: var(--space-300);
+}
+
+.settings-install[hidden] {
+  display: none;
+}
+
+.settings-install__button {
+  width: 100%;
+}
+
+.settings-install__hint {
+  margin: 0;
+  font-size: var(--fs-sm);
+}
+
+/* Mini-application « Roue » (js/features/miniApps/wheel/) */
+.wheel-app {
+  display: grid;
+  gap: var(--space-300);
+}
+
+.wheel-app__stage {
+  position: relative;
+  width: min(100%, 17rem);
+  margin-inline: auto;
+  padding-top: var(--space-200); /* place du repère */
+}
+
+.wheel-app__wheel {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.wheel-app__wheel:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.wheel-app__rotor {
+  width: 100%;
+  height: 100%;
+  transform-origin: 50% 50%;
+  will-change: transform;
+}
+
+.wheel {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.wheel__part {
+  stroke-width: 1.5;
+}
+
+.wheel__label {
+  font-family: var(--font-system);
+  font-weight: 700;
+}
+
+/* Repère fixe en haut : triangle pointant vers la roue. */
+.wheel-app__pointer {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 1.5rem;
+  height: 1.75rem;
+  transform: translateX(-50%);
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+  pointer-events: none;
+}
+
+.wheel-app__result {
+  min-height: 1.3em;
+  margin: 0;
+  font-size: calc(var(--fs-xl) * 1.5);
+  font-weight: 700;
+  line-height: var(--lh-tight);
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.wheel-app__spin {
+  width: 100%;
+  min-height: var(--tap-size-primary);
+}
+
+.wheel-app__drawn {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-200);
+}
+
+.wheel-app__drawn[hidden] {
+  display: none;
+}
+
+.wheel-app__drawn-status,
+.wheel-app__list-title {
+  margin: 0;
+}
+
+.wheel-app__drawn-status {
+  font-size: var(--fs-sm);
+}
+
+.wheel-app__entries {
+  display: grid;
+  gap: var(--space-100);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.wheel-app__entry {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--space-100);
+}
+
+.wheel-app__entry-input {
+  font-size: var(--fs-md);
+}
+
+.wheel-app__add {
+  width: 100%;
+}
+
+/* Paramètres > Mini-apps : menu de tuiles puis application ouverte */
+.miniapps {
+  display: grid;
+  gap: var(--space-300);
+}
+
+.miniapps-menu {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 6.5rem), 1fr)); /* 2 ou 3 par ligne */
+  gap: var(--space-200);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.miniapps-menu[hidden],
+.miniapps-app[hidden] {
+  display: none;
+}
+
+.miniapps-tile {
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: var(--space-100);
+  width: 100%;
+  min-height: var(--tap-size-min);
+  padding: var(--space-300) var(--space-100);
+  border-radius: var(--radius-lg);
+  font: inherit;
+  cursor: pointer;
+  transition: transform 120ms ease-out;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.miniapps-tile:active {
+  transform: scale(0.95);
+}
+
+.miniapps-tile__logo {
+  display: inline-flex;
+  width: 2.5rem;
+  height: 2.5rem;
+}
+
+.miniapps-tile__logo svg {
+  width: 100%;
+  height: 100%;
+}
+
+.miniapps-tile__name {
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.miniapps-app {
+  display: grid;
+  gap: var(--space-200);
+}
+
+.miniapps-app__header {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-200);
+}
+
+.miniapps-app__back {
+  padding-inline: var(--space-200);
+}
+
+.miniapps-app__title {
+  margin: 0;
+  font-family: var(--font-system);
+  font-size: var(--fs-lg);
+  font-weight: 600;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .miniapps-tile {
+    transition: none;
+  }
+}
+
+/* Mini-application « Pile ou face » (js/features/miniApps/coin/) */
+.coin-app {
+  display: grid;
+  gap: var(--space-300);
+}
+
+.coin-app__stage {
+  display: grid;
+  place-items: center;
+  padding-top: var(--space-500); /* place du saut */
+  perspective: 40rem;
+}
+
+.coin-app__coin {
+  width: min(55%, 10rem);
+  aspect-ratio: 1;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.coin {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.coin__face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.coin__face--pile {
+  transform: rotateY(180deg);
+}
+
+.coin__face svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.coin__rim {
+  fill: none;
+  stroke-width: 2.5;
+}
+
+.coin__motif--ring {
+  fill: none;
+  stroke-width: 3;
+}
+
+.coin__label {
+  font-family: var(--font-system);
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.coin-app__result {
+  min-height: 1.3em;
+  margin: 0;
+  font-size: calc(var(--fs-xl) * 1.5);
+  font-weight: 700;
+  line-height: var(--lh-tight);
+  text-align: center;
+}
+
+.coin-app__flip {
+  width: 100%;
+  min-height: var(--tap-size-primary);
+}
+
+.coin-app__counter-row {
+  display: flex;
+  flex-wrap: wrap; /* bouton sous le compteur si la place manque */
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-200);
+}
+
+.coin-app__counter {
+  margin: 0;
+  white-space: nowrap;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Mini-application « Équipes » (js/features/miniApps/teams/) */
+.teams-app {
+  display: grid;
+  gap: var(--space-300);
+}
+
+.teams-app > .settings-choice__label {
+  margin: 0;
+}
+
+.teams-app__list-actions {
+  display: grid;
+  gap: var(--space-100);
+}
+
+.teams-app__value {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 6rem;
+  align-items: center;
+  gap: var(--space-200);
+  font-size: var(--fs-sm);
+}
+
+.teams-app__form {
+  width: 100%;
+  min-height: var(--tap-size-primary);
+}
+
+.teams-app__status {
+  margin: 0;
+  font-size: var(--fs-sm);
+}
+
+.teams-app__status:empty {
+  display: none;
+}
+
+.teams-app__results {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 8rem), 1fr));
+  gap: var(--space-200);
+}
+
+.teams-app__results:empty,
+.teams-app__reshuffle[hidden] {
+  display: none;
+}
+
+.teams-card {
+  display: grid;
+  align-content: start;
+  gap: var(--space-100);
+  padding: var(--space-200) var(--space-300);
+  border-radius: var(--radius-md);
+  border-top: 4px solid;
+  animation: teams-card-in 320ms ease-out both;
+  animation-delay: var(--teams-card-delay, 0ms);
+}
+
+.teams-card__title {
+  margin: 0;
+  font-family: var(--font-system);
+  font-size: var(--fs-md);
+  font-weight: 700;
+}
+
+.teams-card__members {
+  display: grid;
+  gap: var(--space-50);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--fs-sm);
+  overflow-wrap: anywhere;
+}
+
+.teams-app__reshuffle {
+  width: 100%;
+}
+
+@keyframes teams-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.75rem) scale(0.97);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .teams-card {
+    animation: none;
+  }
+}
+
+/* Mini-application « Sablier » (js/features/miniApps/timer/) */
+.timer-app {
+  display: grid;
+  gap: var(--space-300);
+}
+
+.timer-app > .settings-choice__label {
+  margin: 0;
+}
+
+.timer-app__visual {
+  display: grid;
+  place-items: center;
+}
+
+.timer-app__flipper {
+  width: min(40%, 8rem);
+  transform-origin: 50% 50%;
+}
+
+.hourglass {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.hourglass__glass {
+  fill: none;
+  stroke-width: 3;
+  stroke-linejoin: round;
+}
+
+.hourglass__stream {
+  stroke-width: 1.6;
+  stroke-dasharray: 3 3;
+  animation: hourglass-stream 400ms linear infinite;
+}
+
+@keyframes hourglass-stream {
+  to { stroke-dashoffset: -6; }
+}
+
+.timer-app__bar {
+  display: none;
+  width: 100%;
+  height: 0.75rem;
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+}
+
+.timer-app__bar-fill {
+  height: 100%;
+  width: 0;
+}
+
+/* « Réduire les animations » : barre de progression à la place du sable. */
+.timer-app--reduced .timer-app__flipper {
+  display: none;
+}
+
+.timer-app--reduced .timer-app__bar {
+  display: block;
+}
+
+.timer-app__time {
+  margin: 0;
+  font-size: calc(var(--fs-xl) * 2.2);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: var(--lh-tight);
+  text-align: center;
+}
+
+.timer-app__end {
+  margin: 0;
+  font-weight: 700;
+  text-align: center;
+}
+
+.timer-app__end:empty {
+  display: none;
+}
+
+.timer-app__controls {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 7rem), 1fr));
+  gap: var(--space-200);
+}
+
+.timer-app__controls .button {
+  min-width: 0;
+  padding-inline: var(--space-200);
+}
+
+.timer-app__controls .button[hidden] {
+  display: none;
+}
+
+.timer-app__custom {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 4.5rem auto 4.5rem;
+  align-items: center;
+  gap: var(--space-100);
+  font-size: var(--fs-sm);
+}
+
+.timer-app__presets .settings-choice__text {
+  font-size: var(--fs-xs);
+}
+
+/* Fin du décompte : effet bien visible (clignotement du temps et du cadre). */
+.timer-app--done .timer-app__time,
+.timer-app--done .timer-app__end {
+  animation: timer-done 600ms ease-in-out 5 alternate;
+}
+
+.timer-app--done .timer-app__visual {
+  animation: timer-done-glow 600ms ease-in-out 5 alternate;
+  border-radius: var(--radius-lg);
+}
+
+@keyframes timer-done {
+  from { transform: scale(1); }
+  to { transform: scale(1.12); }
+}
+
+@keyframes timer-done-glow {
+  to { box-shadow: 0 0 0 0.5rem var(--color-accent); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hourglass__stream,
+  .timer-app--done .timer-app__time,
+  .timer-app--done .timer-app__end,
+  .timer-app--done .timer-app__visual {
+    animation: none;
+  }
+}
+
+/* Mini-application « Qui commence ? » (js/features/miniApps/chooser/) */
+.chooser-app {
+  display: grid;
+  gap: var(--space-300);
+}
+
+.chooser-app__intro {
+  margin: 0;
+  font-size: var(--fs-sm);
+}
+
+.chooser-app__start {
+  width: 100%;
+  min-height: var(--tap-size-primary);
+}
+
+/* Couche plein écran : au-dessus de tout, barre du bas comprise. */
+html.chooser-active,
+html.chooser-active body {
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+.chooser {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  overflow: hidden;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
+  transition: background-color 400ms ease;
+}
+
+.chooser__close {
+  position: absolute;
+  top: calc(var(--space-300) + env(safe-area-inset-top, 0px));
+  right: var(--space-300);
+  z-index: 2;
+}
+
+.chooser__hint {
+  position: absolute;
+  left: var(--space-300);
+  right: var(--space-300);
+  top: 40%;
+  margin: 0;
+  font-size: var(--fs-xl);
+  font-weight: 700;
+  text-align: center;
+  pointer-events: none;
+}
+
+.chooser[data-phase="counting"] .chooser__hint,
+.chooser[data-phase="result"] .chooser__hint {
+  top: auto;
+  bottom: calc(var(--space-500) + var(--safe-bottom));
+  font-size: var(--fs-md);
+}
+
+.chooser__layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* Cercle sous chaque doigt (centré sur le point de contact). */
+.chooser__circle {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 6.5rem;
+  height: 6.5rem;
+  margin: -3.25rem 0 0 -3.25rem;
+  transition: opacity 250ms ease;
+}
+
+.chooser__dot {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  animation: chooser-in 180ms ease-out both;
+}
+
+.chooser__ring {
+  position: absolute;
+  inset: -0.75rem;
+  width: calc(100% + 1.5rem);
+  height: calc(100% + 1.5rem);
+  overflow: visible;
+  transform: rotate(-90deg);
+}
+
+.chooser__ring circle {
+  fill: none;
+  stroke-width: 4;
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+}
+
+/* Anneau qui se remplit en 3 s pendant l'attente. */
+.chooser--counting .chooser__ring circle {
+  animation: chooser-ring 3000ms linear forwards;
+}
+
+.chooser__circle--out {
+  opacity: 0;
+}
+
+.chooser__circle--winner {
+  z-index: 1;
+}
+
+.chooser__circle--winner .chooser__dot {
+  animation: chooser-win 700ms ease-in-out infinite alternate;
+}
+
+.chooser__circle--winner .chooser__ring {
+  display: none;
+}
+
+/* « Réduire les animations » : pas de pulsation, cercle simplement agrandi. */
+.chooser--reduced .chooser__dot {
+  animation: none;
+}
+
+.chooser--reduced .chooser__circle--winner .chooser__dot {
+  scale: 1.6;
+}
+
+@keyframes chooser-in {
+  from { scale: 0.4; opacity: 0; }
+}
+
+@keyframes chooser-ring {
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes chooser-win {
+  from { scale: 1.5; }
+  to { scale: 1.8; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chooser__dot,
+  .chooser--counting .chooser__ring circle {
+    animation: none;
+  }
+  .chooser--counting .chooser__ring circle {
+    stroke-dashoffset: 0;
+  }
+  .chooser__circle--winner .chooser__dot {
+    scale: 1.6;
   }
 }

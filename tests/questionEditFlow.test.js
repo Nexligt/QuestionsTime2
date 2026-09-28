@@ -7,7 +7,7 @@ import assert from "node:assert/strict";
 import { waitFor, mainIsReady, displayedQuestionId, BASE_QUESTIONS } from "./helpers.js";
 import { openDatabase, STORES } from "../js/data/db.js";
 import {
-  createLocalQuestion, getLocalQuestions, getBaseQuestions, updateLocalQuestion, getLocalEdits,
+  createLocalQuestion, getLocalQuestions, getBaseQuestions, updateLocalQuestion,
 } from "../js/data/questionsRepository.js";
 import { getHistory } from "../js/data/historyRepository.js";
 import { getSetting, setSetting } from "../js/data/settingsRepository.js";
@@ -54,7 +54,7 @@ async function snapshot() {
     mode: await getSetting(SELECTION_MODE_KEY, "strict"),
     filters: await getTagFilterStates(),
     deleted: await all(STORES.QUESTIONS_DELETED),
-    edits: await getLocalEdits(),
+    edits: await all(STORES.QUESTIONS_EDITS),
   };
 }
 
@@ -82,7 +82,8 @@ test("1. le bouton Modifier ouvre le formulaire de modification", async () => {
   await openEditor();
   assert.equal(window.location.hash, "#/question-edit");
   assert.equal(q(".question-form__title").textContent, "Modifier la question");
-  assert.equal(q(".question-form__submit").textContent, "Enregistrer les modifications");
+  assert.equal(q(".question-form__submit").textContent, "Enregistrer");
+  assert.equal(q(".question-form__submit").getAttribute("aria-label"), "Enregistrer les modifications");
   assert.equal(q(".question-form__id").textContent, "Question L-1");
 });
 
@@ -91,7 +92,11 @@ test("2. valeurs existantes préremplies ; tags repliables et suggestions dispon
   assert.equal(q('input[name="author"]').value, original.author);
   assert.deepEqual(chosenTags(), original.tags);
   assert.ok(q(".question-form__suggestions-toggle"));
+  // Modification : suggestions repliées par défaut (formulaire plus court).
+  assert.equal(q(".question-form__suggestions-toggle").getAttribute("aria-expanded"), "false");
+  assert.equal(q(".question-form__suggestions-zone").hidden, true);
   type(q('input[name="tag"]'), "emo");
+  assert.equal(q(".question-form__suggestions-zone").hidden, false); // la saisie les rouvre
   assert.deepEqual([...root().querySelectorAll(".question-form__suggestion")].map((b) => b.dataset.tag), ["Émotion"]);
   type(q('input[name="tag"]'), "");
 });
@@ -164,7 +169,7 @@ test("12. Strict/Libre, historique, filtres, currentQuestionId et suppressions i
 
 test("13. questions de base inchangées ; updateLocalQuestion refuse une question de base", async () => {
   assert.deepEqual(await getBaseQuestions(), BASE_QUESTIONS);
-  assert.deepEqual(await getLocalEdits(), []);
+  assert.deepEqual((await snapshot()).edits, []); // store questionsEdits jamais écrit
   await assert.rejects(() => updateLocalQuestion(1, original));
   await assert.rejects(() => updateLocalQuestion(-99, original)); // inconnue : pas de création
   assert.equal((await getLocalQuestions()).length, 2);

@@ -55,5 +55,5 @@ test("#/splash n'est plus une vue : redirigé vers Main sans Splash", async () =
   window.location.hash = "#/splash";
   await new Promise((r) => setTimeout(r, 30));
   assert.equal(overlay(), null);
-  assert.match(root().textContent, /Vue introuvable|QuestionsTime2/);
+  assert.ok(/Vue introuvable/.test(root().textContent) || root().querySelector('#img-titre img[alt="QuestionsTime2"]'));
 });

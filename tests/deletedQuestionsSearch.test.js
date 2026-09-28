@@ -93,14 +93,16 @@ test("5-7. recherche par identifiant : B-12, b-12, 12 (et b12)", async () => {
   assert.deepEqual(searchQuestions(DATASET, "L-12"), []);
 });
 
-test("id dans l'écran : '1' contient, 'B-1' exact, espace final sans effet", async () => {
+test("id dans l'écran : '1' contient, 'B-1' commence par 1, espace final sans effet", async () => {
   const v = await mountDeleted();
   search(v, "1");
   assert.deepEqual(ids(v), ["B-1", "B-10", "B-11", "B-12"]);
   search(v, "B-1");
-  assert.deepEqual(ids(v), ["B-1"]);
+  assert.deepEqual(ids(v), ["B-1", "B-10", "B-11", "B-12"]);
+  search(v, "B-12");
+  assert.deepEqual(ids(v), ["B-12"]);
   search(v, "B-1 "); // espace final sans effet
-  assert.deepEqual(ids(v), ["B-1"]);
+  assert.deepEqual(ids(v), ["B-1", "B-10", "B-11", "B-12"]);
   search(v, "1 ");
   assert.deepEqual(ids(v), ["B-1", "B-10", "B-11", "B-12"]);
 });
@@ -187,8 +189,8 @@ test("13. aucun résultat : message clair, pas de pagination", async () => {
   assert.match(v.querySelector(".deleted-card__status").textContent, /Aucune question supprimée ne correspond/);
   for (const pager of v.querySelectorAll(".pager")) assert.equal(pager.hidden, true);
 
-  search(v, "B-1"); // une seule page : barre masquée
-  assert.deepEqual(ids(v), ["B-1"]);
+  search(v, "B-12"); // une seule page : barre masquée
+  assert.deepEqual(ids(v), ["B-12"]);
   assert.equal(v.querySelector(".pager").hidden, true);
   assert.equal(v.querySelector(".deleted-card__status").textContent, "");
 });

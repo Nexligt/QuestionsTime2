@@ -6,14 +6,8 @@
 
 :root {
   /* Typographie */
-  --font-body: var(--font-system); /* lot 2 : pointe vers la pile système */
   --font-display: Georgia, "Iowan Old Style", serif;
 
-  --fs-100: clamp(0.8rem, 0.78rem + 0.2vw, 0.9rem);
-  --fs-200: clamp(0.95rem, 0.92rem + 0.3vw, 1.05rem);
-  --fs-300: clamp(1.1rem, 1.05rem + 0.5vw, 1.3rem);
-  --fs-400: clamp(1.4rem, 1.3rem + 1vw, 1.8rem);
-  --fs-500: clamp(1.9rem, 1.7rem + 2vw, 2.6rem);
 
   /* Espacements (rem = accessible, s'adapte à la taille de police système) */
   --space-100: 0.5rem;
@@ -22,14 +16,7 @@
   --space-400: 1.5rem;
   --space-500: 2.5rem;
 
-  /* Zone tactile minimale confortable */
-  --tap-size: var(--tap-size-min); /* lot 2 : 44 px (était 3rem) */
-
-  /* ----------------------------------------------------------------
-     Variables communes AJOUTÉES (lot 1 des retouches visuelles).
-     Elles ne remplacent encore aucune valeur existante : les lots
-     suivants les utiliseront progressivement. Couleurs : themes.css.
-     ---------------------------------------------------------------- */
+  /* Variables communes (retouches visuelles, lots 1 à 3). Couleurs : themes.css. */
 
   /* Espacement complémentaire (grille de 4 px) */
   --space-50: 0.25rem;
@@ -43,7 +30,7 @@
   /* Ombre (rare : éléments posés au-dessus du contenu) */
   --shadow-overlay: 0 0.5rem 1.5rem var(--color-shadow, rgb(0 0 0 / 0.35));
 
-  /* Typographie cible (pas encore appliquée) */
+  /* Typographie */
   --font-system: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", sans-serif;
   --fs-xs: 0.75rem; /* 12 px : ID, indications, barre du bas */
   --fs-sm: 0.8125rem; /* 13 px : descriptions */
@@ -79,7 +66,7 @@ html, body {
 }
 
 body {
-  font-family: var(--font-body);
+  font-family: var(--font-system);
   font-size: var(--fs-md);
   line-height: 1.5;
   padding-top: var(--safe-top);
@@ -92,8 +79,8 @@ h1, h2, h3 {
   margin: 0 0 var(--space-300) 0;
 }
 
-/* Nouvelle échelle (lot 2). Le titre de l'app (.app-title, --fs-400) et le
-   titre du Splash ont leur propre taille : ils ne sont pas concernés. */
+/* Nouvelle échelle (lot 2). Le titre de l'app et celui du Splash sont une
+   image (assets/img_Titre.svg) : ils ne sont pas concernés. */
 h1 { font-size: var(--fs-xl); }
 h2 { font-size: var(--fs-lg); }
 h3 { font-size: var(--fs-md); }

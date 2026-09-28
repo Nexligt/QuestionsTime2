@@ -88,11 +88,12 @@ for (const reduced of [false, true]) {
     });
     const page = await openSplash(context);
 
-    // Même mise en forme pour les deux titres (hors taille), une seule ligne.
+    // Même image pour les deux titres, même rapport largeur/hauteur.
     const styles = await page.evaluate(() => {
       const pick = (el) => {
-        const s = getComputedStyle(el);
-        return { fontFamily: s.fontFamily, fontWeight: s.fontWeight, fontStyle: s.fontStyle, letterSpacing: s.letterSpacing, whiteSpace: s.whiteSpace, lineHeight: Math.round((parseFloat(s.lineHeight) / parseFloat(s.fontSize)) * 1000) / 1000 }; // ratio (arrondi : flottants)
+        const img = el.querySelector("img");
+        // Dimensions de mise en page (hors transformations du flottement).
+        return { src: img?.getAttribute("src") ?? null, alt: img?.alt ?? null, loaded: Boolean(img?.complete && img.naturalWidth), ratio: parseFloat(getComputedStyle(el).width) / parseFloat(getComputedStyle(el).height) };
       };
       return {
         splash: pick(document.getElementById("img-titre-splash")),
@@ -102,8 +103,8 @@ for (const reduced of [false, true]) {
         mainHidden: getComputedStyle(document.getElementById("img-titre")).visibility,
       };
     });
-    check(`${label} : mise en forme identique des deux titres`, JSON.stringify(styles.splash) === JSON.stringify(styles.main), JSON.stringify(styles.splash));
-    check(`${label} : titre sur une ligne (nowrap)`, styles.splash.whiteSpace === "nowrap");
+    check(`${label} : même image pour les deux titres`, styles.splash.src === "assets/img_Titre.svg" && styles.splash.src === styles.main.src && styles.splash.alt === "QuestionsTime2" && styles.splash.loaded, JSON.stringify(styles.splash));
+    check(`${label} : même rapport largeur/hauteur`, Math.abs(styles.splash.ratio - styles.main.ratio) < 0.01, `${styles.splash.ratio.toFixed(4)} / ${styles.main.ratio.toFixed(4)}`);
     check(`${label} : défilement bloqué pendant le Splash`, styles.lock === "hidden");
     check(`${label} : vrai titre caché sous le Splash`, styles.mainHidden === "hidden");
     check(`${label} : flottement ${reduced ? "absent" : "actif"}`, reduced ? styles.infinite === 0 : styles.infinite === 3, `${styles.infinite} animation(s) infinie(s)`);

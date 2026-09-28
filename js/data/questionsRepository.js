@@ -53,13 +53,6 @@ export async function getBaseQuestionOverrides() {
   return (await getAllFromStore(STORES.QUESTIONS_USER)).filter((q) => q.id > 0);
 }
 
-/**
- * Modifications locales appliquées à des questions de base (IndexedDB).
- * @returns {Promise<Array>}
- */
-export function getLocalEdits() {
-  return getAllFromStore(STORES.QUESTIONS_EDITS);
-}
 
 /**
  * Entrées marquant des questions supprimées/masquées localement,
@@ -383,6 +376,33 @@ export async function restoreBaseQuestion(id) {
       reject(
         new Error(
           `[questionsRepository] Impossible de restaurer la question : ${tx.error?.message ?? tx.error}`
+        )
+      );
+  });
+}
+
+/**
+ * Restaure l'ORIGINAL d'une question de base modifiée : supprime son
+ * override de `questionsUser` (même id positif). La question redevient
+ * celle de data/questions.base.json. `questionsDeleted`, l'historique et
+ * les filtres ne sont pas touchés.
+ * @param {number} id - id positif d'une question de base.
+ * @returns {Promise<void>}
+ */
+export async function removeBaseQuestionOverride(id) {
+  const base = await getBaseQuestions();
+  if (typeof id !== "number" || !(id > 0) || !base.some((q) => q.id === id)) {
+    throw new Error(`[questionsRepository] Question de base introuvable (id ${id}).`);
+  }
+  const db = await openDatabase();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORES.QUESTIONS_USER, "readwrite");
+    tx.objectStore(STORES.QUESTIONS_USER).delete(id);
+    tx.oncomplete = () => resolve();
+    tx.onerror = () =>
+      reject(
+        new Error(
+          `[questionsRepository] Impossible de restaurer l'original : ${tx.error?.message ?? tx.error}`
         )
       );
   });

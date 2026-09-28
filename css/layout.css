@@ -30,7 +30,7 @@ body {
 /* Quand le menu inférieur est visible, on laisse de la place en bas
    pour que le contenu ne soit jamais masqué derrière lui. */
 body.has-bottom-nav .view-root {
-  padding-bottom: calc(var(--space-400) + var(--tap-size) + var(--space-300));
+  padding-bottom: calc(var(--space-400) + var(--tap-size-min) + var(--space-300));
 }
 
 .bottom-nav {
@@ -48,15 +48,19 @@ body.has-bottom-nav .view-root {
   display: none;
 }
 
+/* Boutons répartis à parts égales : ajouter ou retirer un élément de
+   NAV_ITEMS ne demande aucune retouche de mise en page. */
 .nav-item {
+  position: relative; /* ancre de l'indicateur de l'onglet actif */
   flex: 1 1 0;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 0.2rem;
-  min-height: var(--tap-size);
-  padding: var(--space-100) 0;
+  gap: var(--space-50);
+  min-height: var(--tap-size-min);
+  padding: var(--space-100) var(--space-50);
   background: none;
   border: none;
   cursor: pointer;
@@ -73,15 +77,32 @@ body.has-bottom-nav .view-root {
   height: 100%;
 }
 
+/* Indicateur de l'onglet actif (couleur dans themes.css). */
+.nav-item[aria-current="page"]::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: var(--space-500);
+  height: 3px;
+  border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+  transform: translateX(-50%);
+}
+
 .nav-item__label {
-  font-size: var(--fs-xs);
+  max-width: 100%;
+  font-size: var(--fs-xs); /* 12 px */
+  line-height: var(--lh-tight);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* ------------------------------------------------------------------
-   Titres du Splash et de Main : MÊME mise en forme, seule la taille
-   diffère (indispensable pour que le facteur d'échelle de l'envol soit
-   exact — voir js/ui/splashIntro.js). Une seule ligne, largeur ajustée
-   au contenu, centré.
+   Titres du Splash et de Main : MÊME image (assets/img_Titre.svg), seule
+   la largeur diffère ; la hauteur suit le rapport largeur/hauteur de
+   l'image, identique des deux côtés (indispensable pour que le facteur
+   d'échelle de l'envol soit exact — voir js/ui/splashIntro.js).
    ------------------------------------------------------------------ */
 .splash__title,
 .main-header .app-title {
@@ -90,26 +111,22 @@ body.has-bottom-nav .view-root {
   max-width: none;
   margin: 0 auto;
   padding: 0;
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-style: normal;
-  letter-spacing: normal;
-  word-spacing: normal;
-  text-transform: none;
-  line-height: 1.15;
-  white-space: nowrap;
+  line-height: 0; /* aucune marge de ligne autour de l'image */
 }
 
-.splash__title {
-  font-size: clamp(2rem, 10vw, 4.5rem);
-}
-
-/* Titre = image (future img_Titre) : même hauteur de ligne que le texte. */
 .splash__title img,
 .main-header .app-title img {
   display: block;
-  height: 1.15em;
-  width: auto;
+  max-width: none;
+  height: auto;
+}
+
+.main-header .app-title img {
+  width: clamp(12.5rem, 62vw, 16.5rem);
+}
+
+.splash__title img {
+  width: min(84vw, 28rem);
 }
 
 /* Écran de lancement : couche plein écran au-dessus de Main
@@ -173,9 +190,16 @@ body.has-bottom-nav .view-root {
   pointer-events: none;
 }
 
+/* Indication en bas de l'écran, discrète (couleur : themes.css). */
 .splash__hint {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: calc(var(--space-500) + var(--safe-bottom));
   margin: 0;
-  font-size: var(--fs-100);
+  padding-inline: var(--space-300);
+  font-size: var(--fs-xs);
+  text-align: center;
 }
 
 /* Défilement bloqué tant que le Splash est affiché. */

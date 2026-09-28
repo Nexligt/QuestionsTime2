@@ -38,6 +38,7 @@ import { getAvailableQuestions, deleteQuestion } from "../../data/questionsRepos
 import { navigateTo } from "../../core/router.js";
 import { formatQuestionId } from "./questionId.js";
 import { openQuestionEditor } from "./questionFormView.js";
+import { openQuestionSearch } from "./questionSearchOverlay.js";
 import { getTagFilterStates } from "../../data/filtersRepository.js";
 import { attachLeftSwipe } from "../../ui/swipeGesture.js";
 import {
@@ -54,6 +55,7 @@ import {
 import {
   getCurrentQuestion,
   advanceToNextQuestion,
+  showQuestion,
   getCurrentSelectionMode,
   toggleSelectionMode,
 } from "./questionEngine.js";
@@ -63,15 +65,24 @@ import {
   SELECTION_MODES,
 } from "./questionSelection.js";
 
+/**
+ * Titre de l'app : image SVG (lettres en tracés, générée par
+ * tools/title/generate_title.py). width/height = dimensions du SVG, pour
+ * réserver la place avant chargement (le Splash recopie ce titre).
+ */
+export const TITLE_IMAGE = Object.freeze({ src: "assets/img_Titre.svg", alt: "QuestionsTime2", width: 701, height: 184 });
+
 /** Icônes inline (pas de fetch séparé : boutons statiques, non configurables). */
 const ACTION_ICONS = {
   add: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`,
   edit: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>`,
+  search: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="6.5"/><line x1="16" y1="16" x2="20.5" y2="20.5"/></svg>`,
   delete: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 7h14"/><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/><path d="M6.5 7l1 12a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1l1-12"/></svg>`,
 };
 
 const ACTIONS = [
   { key: "add", label: "Créer une question" },
+  { key: "search", label: "Rechercher une question" },
   { key: "edit", label: "Modifier la question actuelle" },
   { key: "delete", label: "Supprimer la question actuelle" },
 ];
@@ -94,7 +105,12 @@ export function createMainView() {
   const title = document.createElement("h1");
   title.id = "img-titre";
   title.className = "app-title";
-  title.textContent = "QuestionsTime2";
+  const titleImage = document.createElement("img");
+  titleImage.src = TITLE_IMAGE.src;
+  titleImage.alt = TITLE_IMAGE.alt;
+  titleImage.width = TITLE_IMAGE.width;
+  titleImage.height = TITLE_IMAGE.height;
+  title.append(titleImage);
 
   const modeIndicator = document.createElement("button");
   modeIndicator.type = "button";
@@ -102,9 +118,15 @@ export function createMainView() {
   modeIndicator.textContent = "Mode : …";
   modeIndicator.disabled = true; // réactivé une fois le mode lu
 
-  header.append(title, modeIndicator);
+  header.append(title);
 
   const actionBar = createActionBar();
+
+  // Mode Strict/Libre et actions : groupés au-dessus de la carte, dans le
+  // bloc centré.
+  const controls = document.createElement("div");
+  controls.className = "main-controls";
+  controls.append(modeIndicator, actionBar);
 
   const questionCard = document.createElement("section");
   questionCard.className = "card question-card";
@@ -119,14 +141,14 @@ export function createMainView() {
 
   const deleteConfirm = createDeleteConfirm();
 
-  // Bloc central (confirmation éventuelle, carte, « Suivante ») : centré
-  // verticalement dans l'espace entre le bandeau d'actions et la barre du
-  // bas ; reprend sa place en haut (et la page défile) s'il est trop haut.
+  // Bloc central (mode + actions, confirmation éventuelle, carte,
+  // « Suivante ») : centré verticalement entre le titre et la barre du bas ;
+  // reprend sa place en haut (et la page défile) s'il est trop haut.
   const stage = document.createElement("div");
   stage.className = "main-stage";
-  stage.append(deleteConfirm.root, questionCard, nextButton);
+  stage.append(controls, deleteConfirm.root, questionCard, nextButton);
 
-  view.append(header, actionBar, stage);
+  view.append(header, stage);
 
   wireModeIndicator(modeIndicator);
   const editButton = actionBar.querySelector('[data-action="edit"]');
@@ -148,10 +170,23 @@ export function createMainView() {
     view.replaceWith(createMainView());
   });
 
+  // Recherche : couche par-dessus Main, parmi les questions compatibles
+  // avec les filtres ; le résultat touché devient la question affichée.
+  const searchButton = actionBar.querySelector('[data-action="search"]');
+  const search = {};
+  searchButton.addEventListener("click", () => {
+    if (!search.questions) return;
+    openQuestionSearch({ questions: search.questions, onSelect: search.show, returnFocus: searchButton });
+  });
+
   wireQuestionSelection(questionCard, nextButton, (question) => {
     updateEditButton(editButton, question);
     updateEditButton(deleteButton, question);
     deleteConfirm.close();
+  }, (questions, show) => {
+    search.questions = questions;
+    search.show = show;
+    searchButton.disabled = false;
   });
 
   return view;
@@ -214,6 +249,10 @@ function createActionBar() {
     if (action.key === "add") {
       // "+" : écran de création d'une question locale.
       button.addEventListener("click", () => navigateTo("question-form"));
+    }
+    if (action.key === "search") {
+      // Activé une fois les questions compatibles chargées.
+      button.disabled = true;
     }
     if (action.key === "edit") {
       // Activé dès qu'une question (locale ou de base) est affichée
@@ -325,7 +364,7 @@ function updateEditButton(editButton, question) {
   else delete editButton.dataset.questionId;
 }
 
-async function wireQuestionSelection(questionCard, nextButton, onQuestionDisplayed = () => {}) {
+async function wireQuestionSelection(questionCard, nextButton, onQuestionDisplayed = () => {}, onSearchReady = () => {}) {
   let questions;
   let baseQuestions;
   try {
@@ -423,6 +462,7 @@ async function wireQuestionSelection(questionCard, nextButton, onQuestionDisplay
     console.error("[mainView] Impossible de lire le réglage de navigation :", error);
   }
   const goToNextQuestion = () => runEngine(() => advanceToNextQuestion(questions));
+  onSearchReady(questions, (id) => runEngine(() => showQuestion(questions, id)));
 
   nextButton.hidden = !isButtonEnabled(nextNavigation);
   nextButton.addEventListener("click", () => {

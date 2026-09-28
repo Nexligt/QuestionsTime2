@@ -230,13 +230,14 @@ test("titre image (future img_Titre SVG) : cloné tel quel, décodage attendu av
   }
 });
 
-test("CSS : mêmes règles de mise en forme pour les deux titres, une seule ligne ; défilement bloqué", () => {
+test("CSS : règles communes pour l'image des deux titres (hauteur selon le rapport de l'image) ; défilement bloqué", () => {
   const css = readFileSync(new URL("../css/layout.css", import.meta.url), "utf-8");
   const shared = /\.splash__title,\s*\.main-header \.app-title\s*\{([^}]*)\}/.exec(css);
   assert.ok(shared, "règle commune");
-  for (const decl of ["white-space: nowrap", "font-family: var(--font-display)", "font-weight: 700", "letter-spacing: normal", "line-height: 1.15", "width: fit-content"]) {
-    assert.ok(shared[1].includes(decl), decl);
-  }
+  for (const decl of ["width: fit-content", "margin: 0 auto", "line-height: 0"]) assert.ok(shared[1].includes(decl), decl);
+  const img = /\.splash__title img,\s*\.main-header \.app-title img\s*\{([^}]*)\}/.exec(css);
+  assert.ok(img, "règle commune de l'image");
+  assert.ok(img[1].includes("height: auto"));
   assert.match(css, /html\.splash-active \.view-root\s*\{[^}]*overflow: hidden/);
   assert.match(css, /\.splash-intro\s*\{[^}]*position: fixed;[^}]*inset: 0/);
   const source = readFileSync(new URL("../js/ui/splashIntro.js", import.meta.url), "utf-8");

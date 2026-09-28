@@ -58,7 +58,7 @@ test("3-4. un seul contenu visible, et chaque choix affiche le bon contenu", asy
   assert.deepEqual(visiblePanels(v), ["mini-apps"]);
   assert.equal(tab(v, "mini-apps").getAttribute("aria-selected"), "true");
   assert.equal(tab(v, "reglages").getAttribute("aria-selected"), "false");
-  assert.match(panel(v, "mini-apps").textContent, /Aucune mini-application disponible pour le moment\./);
+  assert.deepEqual([...panel(v, "mini-apps").querySelectorAll(".miniapps-tile")].map((t) => t.dataset.app), ["dice", "wheel", "coin", "teams", "timer", "chooser"]); // menu de tuiles
 
   tab(v, "informations").click();
   assert.deepEqual(visiblePanels(v), ["informations"]);

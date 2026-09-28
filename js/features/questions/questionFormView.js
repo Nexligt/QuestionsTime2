@@ -24,15 +24,34 @@ import {
   getQuestionById,
   updateLocalQuestion,
   saveBaseQuestionOverride,
+  getBaseQuestions,
+  getBaseQuestionOverrides,
+  getDeletedQuestionEntries,
+  removeBaseQuestionOverride,
 } from "../../data/questionsRepository.js";
 import { getSetting } from "../../data/settingsRepository.js";
 import { CURRENT_QUESTION_ID_KEY } from "./questionEngine.js";
-import { formatQuestionId } from "./questionId.js";
+import { formatQuestionId, parseQuestionId } from "./questionId.js";
 import { navigateTo } from "../../core/router.js";
 import { extractTags, searchTags } from "../filters/tagFilters.js";
 import { addTagsFromText, tagKey, validateQuestionDraft } from "./localQuestion.js";
 
 let fieldCounter = 0;
+
+/**
+ * Question à charger par son ID affiché (« B-5 », « L-3 »).
+ * @returns {Promise<{status:"ok"|"invalid"|"unknown"|"deleted", id?:number}>}
+ */
+export async function findQuestionToEdit(label) {
+  const id = parseQuestionId(label);
+  if (id === null) return { status: "invalid" };
+  if (await getQuestionById(id)) return { status: "ok", id };
+  if (id > 0) {
+    const [base, deleted] = await Promise.all([getBaseQuestions(), getDeletedQuestionEntries()]);
+    if (base.some((q) => q.id === id) && deleted.some((entry) => entry.id === id)) return { status: "deleted", id };
+  }
+  return { status: "unknown", id };
+}
 
 /** Question locale à modifier, transmise par Main avant la navigation. */
 let pendingEditId = null;
@@ -73,12 +92,35 @@ function buildQuestionForm({ mode, questionId = null }) {
   form.noValidate = true; // validation gérée ici, messages en français
 
   const heading = document.createElement("h1");
-  heading.className = "question-form__title";
+  heading.className = "page-title question-form__title";
   heading.textContent = isEdit ? "Modifier la question" : "Nouvelle question";
 
   const idLabel = document.createElement("p");
   idLabel.className = "question-form__id";
   idLabel.hidden = !isEdit;
+
+  // --- Charger une question par son ID ------------------------------------
+  const loadRow = document.createElement("div");
+  loadRow.className = "question-form__load";
+  const loadLabel = document.createElement("label");
+  loadLabel.className = "question-form__load-label";
+  loadLabel.htmlFor = `qf-load-${uid}`;
+  loadLabel.textContent = "ID";
+  const loadInput = document.createElement("input");
+  loadInput.id = `qf-load-${uid}`;
+  loadInput.type = "text";
+  loadInput.className = "question-form__input question-form__load-input";
+  loadInput.placeholder = "B-5";
+  loadInput.autocomplete = "off";
+  loadInput.enterKeyHint = "go";
+  const loadButton = document.createElement("button");
+  loadButton.type = "button";
+  loadButton.className = "button button--secondary question-form__load-button";
+  loadButton.textContent = "Charger";
+  loadRow.append(loadLabel, loadInput, loadButton);
+  const loadStatus = document.createElement("p");
+  loadStatus.className = "question-form__load-status";
+  loadStatus.setAttribute("aria-live", "polite");
 
   const summary = document.createElement("p");
   summary.className = "question-form__summary";
@@ -89,7 +131,7 @@ function buildQuestionForm({ mode, questionId = null }) {
   const texteInput = document.createElement("textarea");
   texteInput.id = `qf-texte-${uid}`;
   texteInput.name = "texte";
-  texteInput.rows = 4;
+  texteInput.rows = 3;
   texteInput.className = "question-form__input question-form__textarea";
   texteInput.placeholder = "Saisissez la question…";
   texteField.control.append(texteInput);
@@ -164,12 +206,40 @@ function buildQuestionForm({ mode, questionId = null }) {
   const submitButton = document.createElement("button");
   submitButton.type = "submit";
   submitButton.className = "button question-form__submit";
-  submitButton.textContent = isEdit ? "Enregistrer les modifications" : "Enregistrer";
+  // Libellé court (tient sur une ligne à 320 px) ; nom complet lu par les
+  // lecteurs d'écran en modification.
+  submitButton.textContent = "Enregistrer";
+  if (isEdit) submitButton.setAttribute("aria-label", "Enregistrer les modifications");
   submitButton.disabled = isEdit; // réactivé une fois la question chargée
   actions.append(cancelButton, submitButton);
 
-  form.append(heading, idLabel, summary, texteField.root, tagsField.root, authorField.root, actions);
-  view.append(form);
+  // --- Restaurer l'original (question de base modifiée uniquement) ---------
+  const restoreButton = document.createElement("button");
+  restoreButton.type = "button";
+  restoreButton.className = "button button--secondary question-form__restore";
+  restoreButton.textContent = "Restaurer l'original";
+  restoreButton.hidden = true;
+  const restoreConfirm = document.createElement("div");
+  restoreConfirm.className = "question-form__restore-confirm";
+  restoreConfirm.setAttribute("role", "alertdialog");
+  restoreConfirm.hidden = true;
+  const restoreMessage = document.createElement("p");
+  restoreMessage.className = "question-form__restore-message";
+  const restoreActions = document.createElement("div");
+  restoreActions.className = "question-form__actions";
+  const restoreCancel = document.createElement("button");
+  restoreCancel.type = "button";
+  restoreCancel.className = "button button--secondary question-form__restore-cancel";
+  restoreCancel.textContent = "Annuler";
+  const restoreOk = document.createElement("button");
+  restoreOk.type = "button";
+  restoreOk.className = "button question-form__restore-confirm-button";
+  restoreOk.textContent = "Restaurer";
+  restoreActions.append(restoreCancel, restoreOk);
+  restoreConfirm.append(restoreMessage, restoreActions);
+
+  form.append(loadRow, loadStatus, idLabel, summary, texteField.root, tagsField.root, authorField.root, actions, restoreButton, restoreConfirm);
+  view.append(heading, form);
 
   // --- État & comportement ----------------------------------------------
   let tags = [];
@@ -276,7 +346,9 @@ function buildQuestionForm({ mode, questionId = null }) {
     if (!Object.values(fields).some((f) => f.error.textContent)) summary.textContent = "";
   }
 
-  setSuggestionsExpanded(true);
+  // Création : suggestions visibles ; modification : repliées (formulaire
+  // plus court), dépliables d'un toucher.
+  setSuggestionsExpanded(!isEdit);
   suggestionsToggle.addEventListener("click", () => {
     setSuggestionsExpanded(suggestionsToggle.getAttribute("aria-expanded") !== "true");
   });
@@ -299,6 +371,71 @@ function buildQuestionForm({ mode, questionId = null }) {
   authorInput.addEventListener("input", () => clearError("author"));
 
   cancelButton.addEventListener("click", () => navigateTo("main"));
+
+  // Charger par ID : la question s'ouvre dans ce même écran, en modification.
+  async function loadById() {
+    loadStatus.replaceChildren();
+    const result = await findQuestionToEdit(loadInput.value).catch(() => ({ status: "unknown" }));
+    view.dataset.loadStatus = result.status;
+    if (result.status === "ok") {
+      view.replaceWith(buildQuestionForm({ mode: "edit", questionId: result.id }));
+      return;
+    }
+    if (result.status === "invalid") {
+      loadStatus.textContent = "ID non reconnu : saisissez par exemple B-5 ou L-3.";
+    } else if (result.status === "deleted") {
+      const link = document.createElement("a");
+      link.href = "#/deleted-questions";
+      link.textContent = "Questions supprimées";
+      loadStatus.append(`La question ${formatQuestionId(result.id)} est supprimée : restaurez-la depuis la page `, link, ".");
+    } else {
+      loadStatus.textContent = `Aucune question ${formatQuestionId(result.id)}.`;
+    }
+  }
+  loadButton.addEventListener("click", loadById);
+  loadInput.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault(); // ne soumet pas le formulaire
+      loadById();
+    }
+  });
+
+  function fillForm(question) {
+    texteInput.value = question.texte;
+    authorInput.value = question.author;
+    tags = [...question.tags];
+    for (const name of Object.keys(fields)) setError(name, "");
+    renderTags();
+  }
+
+  restoreButton.addEventListener("click", () => {
+    restoreMessage.textContent = `Restaurer la version d'origine de ${formatQuestionId(editedId)} ? Vos modifications seront perdues.`;
+    restoreConfirm.hidden = false;
+    restoreButton.hidden = true;
+  });
+  restoreCancel.addEventListener("click", () => {
+    restoreConfirm.hidden = true;
+    restoreButton.hidden = false;
+  });
+  restoreOk.addEventListener("click", async () => {
+    restoreOk.disabled = true;
+    try {
+      await removeBaseQuestionOverride(editedId);
+      const original = await getQuestionById(editedId);
+      if (original) fillForm(original);
+      restoreConfirm.hidden = true;
+      summary.textContent = "Version d'origine restaurée.";
+      summary.dataset.status = "success";
+    } catch (error) {
+      console.error("[questionFormView] Restauration impossible :", error);
+      summary.textContent = "Impossible de restaurer l'original pour le moment.";
+      summary.dataset.status = "error";
+      restoreButton.hidden = false;
+      restoreConfirm.hidden = true;
+    } finally {
+      restoreOk.disabled = false;
+    }
+  });
 
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -369,11 +506,14 @@ function buildQuestionForm({ mode, questionId = null }) {
       editedId = question.id;
       idLabel.textContent = `Question ${formatQuestionId(question.id)}`;
       view.dataset.questionId = String(question.id);
-      texteInput.value = question.texte;
-      authorInput.value = question.author;
-      tags = [...question.tags];
-      renderTags();
+      fillForm(question);
       submitButton.disabled = false;
+      // « Restaurer l'original » : question de base ayant une version locale.
+      if (question.id > 0) {
+        const overrides = await getBaseQuestionOverrides().catch(() => []);
+        restoreButton.hidden = !overrides.some((q) => q.id === question.id);
+      }
+      view.dataset.ready = "true";
     })();
   }
 

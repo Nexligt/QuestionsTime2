@@ -28,11 +28,78 @@ export async function registerServiceWorker() {
  * @returns {boolean}
  */
 export function isRunningStandalone() {
-  const isStandaloneDisplay = window.matchMedia(
-    "(display-mode: standalone)"
-  ).matches;
+  const isStandaloneDisplay = Boolean(
+    window.matchMedia?.("(display-mode: standalone)")?.matches
+  );
   // Cas particulier iOS/Safari.
   const isIosStandalone = window.navigator.standalone === true;
 
   return isStandaloneDisplay || isIosStandalone;
+}
+
+/* ------------------------------------------------------------------
+   Invitation à installer (facultative, jamais automatique)
+   - Android/Chrome : l'événement `beforeinstallprompt` est mis de côté
+     (la mini-barre du navigateur ne s'affiche pas) ; seul le bouton de
+     Paramètres > Infos ouvre la fenêtre d'installation.
+   - iPhone : pas d'événement, seulement une explication (Partager →
+     Sur l'écran d'accueil).
+   - Déjà installée (mode installé ou `appinstalled`) : rien.
+   ------------------------------------------------------------------ */
+
+let deferredInstallPrompt = null;
+let installedThisSession = false;
+const installListeners = new Set();
+
+function notifyInstallListeners() {
+  for (const listener of installListeners) listener(getInstallState());
+}
+
+/** À appeler une fois, le plus tôt possible (app.js). */
+export function initInstallPrompt(win = window) {
+  win.addEventListener("beforeinstallprompt", (event) => {
+    event.preventDefault(); // pas de proposition automatique
+    deferredInstallPrompt = event;
+    notifyInstallListeners();
+  });
+  win.addEventListener("appinstalled", () => {
+    deferredInstallPrompt = null;
+    installedThisSession = true;
+    notifyInstallListeners();
+  });
+}
+
+/** iPhone / iPad (y compris iPadOS qui se présente comme un Mac). */
+export function isIosDevice(nav = window.navigator) {
+  const ua = nav?.userAgent ?? "";
+  return /iPhone|iPad|iPod/i.test(ua) || (/Macintosh/i.test(ua) && (nav?.maxTouchPoints ?? 0) > 1);
+}
+
+/**
+ * @returns {{ installed: boolean, canPrompt: boolean, ios: boolean }}
+ */
+export function getInstallState() {
+  const installed = installedThisSession || isRunningStandalone();
+  return {
+    installed,
+    canPrompt: !installed && deferredInstallPrompt !== null,
+    ios: !installed && isIosDevice(),
+  };
+}
+
+/** Ouvre la fenêtre d'installation du navigateur (Android/Chrome). */
+export async function promptInstall() {
+  const event = deferredInstallPrompt;
+  if (!event) return "unavailable";
+  deferredInstallPrompt = null; // utilisable une seule fois
+  notifyInstallListeners();
+  await event.prompt();
+  const choice = await event.userChoice?.catch?.(() => null);
+  return choice?.outcome ?? "dismissed";
+}
+
+/** Abonnement aux changements (installation possible, installée…). */
+export function onInstallStateChange(listener) {
+  installListeners.add(listener);
+  return () => installListeners.delete(listener);
 }
