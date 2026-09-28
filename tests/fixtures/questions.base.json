@@ -1,0 +1,32 @@
+[
+  {
+    "id": 1,
+    "texte": "Quel est le voyage qui t'a le plus marqué ?",
+    "tags": ["Souvenir", "Voyage"],
+    "author": "base"
+  },
+  {
+    "id": 2,
+    "texte": "Quelle est la décision la plus difficile que tu aies prise cette année ?",
+    "tags": ["Réflexion"],
+    "author": "base"
+  },
+  {
+    "id": 3,
+    "texte": "Quel est le compliment qui t'a le plus touché ?",
+    "tags": ["Émotion", "Souvenir"],
+    "author": "base"
+  },
+  {
+    "id": 4,
+    "texte": "Si tu pouvais recommencer une journée de ta vie, laquelle choisirais-tu ?",
+    "tags": ["Réflexion", "Souvenir"],
+    "author": "base"
+  },
+  {
+    "id": 5,
+    "texte": "Quel est le lieu le plus insolite où tu as fait l'amour ?",
+    "tags": ["Sexualité", "Souvenir"],
+    "author": "base"
+  }
+]

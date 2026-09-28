@@ -1,0 +1,921 @@
+/*
+  components.css
+  Petits composants visuels réutilisables (boutons, cartes).
+  A enrichir au fur et à mesure des prochaines étapes.
+*/
+
+.card {
+  border-radius: 1rem;
+  padding: var(--space-300);
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--tap-size);
+  padding-inline: var(--space-300);
+  border: none;
+  border-radius: 0.75rem;
+  font-size: var(--fs-md);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* Écran Main : titre en tête de page (pas celui du splash, mais le
+   même point d'accroche `#img-titre` — voir js/features/questions/mainView.js). */
+.main-header {
+  text-align: center;
+}
+
+.app-title {
+  margin: 0;
+  font-size: var(--fs-400);
+}
+
+.mode-indicator {
+  display: inline-flex;
+  margin: var(--space-100) auto 0;
+  padding: 0.15rem 0.75rem;
+  border-radius: 999px;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  /* Bouton (bascule Strict/Libre) : zone tactile confortable. */
+  min-height: 2.25rem;
+  align-items: center;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+/* Bandeau d'actions (créer / modifier / supprimer la question actuelle) */
+.action-bar {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-300);
+}
+
+.icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--tap-size);
+  height: var(--tap-size);
+  padding: 0;
+  border: 1px solid var(--color-border);
+  border-radius: 0.75rem;
+  cursor: pointer;
+}
+
+.icon-button svg {
+  width: 1.4rem;
+  height: 1.4rem;
+}
+
+/* Carte de la question courante */
+.question-card {
+  display: grid;
+  gap: var(--space-200);
+  text-align: center;
+}
+
+.question-card__text {
+  font-size: var(--fs-question);
+  line-height: 1.35;
+  margin: 0;
+}
+
+.question-card__id {
+  margin: 0;
+  font-size: var(--fs-xs);
+}
+
+.question-card__tags {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-100);
+  margin: 0;
+  padding: 0;
+}
+
+.tag-chip {
+  font-size: var(--fs-xs);
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  border: 1px solid var(--color-border);
+}
+
+/* Liste d'indications affichée quand le mode Strict est épuisé. */
+.question-card__hints {
+  text-align: left;
+  margin: 0;
+  padding-left: 1.25rem;
+  font-size: var(--fs-sm);
+}
+
+.question-card__hints li {
+  margin-bottom: 0.25rem;
+}
+
+.question-next {
+  width: 100%;
+  min-height: var(--tap-size-primary);
+}
+
+/* Écran Filtres (js/features/filters/filtersView.js) */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.filters-card {
+  display: grid;
+  gap: var(--space-200);
+}
+
+.filters-card h1,
+.filters-help,
+.filters-summary {
+  margin: 0;
+}
+
+.filters-help,
+.filters-summary {
+  font-size: var(--fs-sm);
+}
+
+.filters-search__input {
+  width: 100%;
+  min-height: var(--tap-size);
+  padding-inline: var(--space-300);
+  border-radius: 0.75rem;
+  font: inherit;
+}
+
+/* Grille des tags. Nombre de colonnes réglable :
+   --filters-columns = auto-fill (autant que la largeur le permet) ou un
+   nombre (ex. 2) ; --filters-column-min = largeur minimale d'une colonne. */
+.filters-tags {
+  --filters-columns: auto-fill;
+  --filters-column-min: 7.5rem;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(var(--filters-columns), minmax(min(100%, var(--filters-column-min)), 1fr));
+  gap: var(--space-100);
+  margin: 0;
+  padding: 0;
+}
+
+.filter-tag {
+  display: flex;
+  align-items: center;
+  gap: var(--space-100);
+  width: 100%;
+  min-width: 0;
+  min-height: var(--tap-size-min); /* 44 px */
+  padding-inline: var(--space-100);
+  border-radius: var(--radius-pill);
+  font: inherit;
+  font-size: var(--fs-chip);
+  line-height: var(--lh-tight);
+  text-align: left;
+  cursor: pointer;
+}
+
+.filter-tag__name {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* Symboles d'état dessinés en CSS (rendu identique iPhone / Android) et
+   reconnaissables sans la couleur : neutre = cercle vide, obligatoire =
+   pastille pleine avec coche, exclu = cercle barré d'une croix (+ nom barré). */
+.filter-tag__symbol {
+  position: relative;
+  flex: none;
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid currentColor;
+  border-radius: 50%;
+}
+
+.filter-tag[data-state="required"] .filter-tag__symbol {
+  background: currentColor;
+}
+
+.filter-tag[data-state="required"] .filter-tag__symbol::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 45%;
+  width: 0.25rem;
+  height: 0.45rem;
+  border: solid var(--color-accent);
+  border-width: 0 2px 2px 0;
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.filter-tag[data-state="excluded"] .filter-tag__symbol::before,
+.filter-tag[data-state="excluded"] .filter-tag__symbol::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0.55rem;
+  height: 2px;
+  background: currentColor;
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.filter-tag[data-state="excluded"] .filter-tag__symbol::after {
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+/* Écran Paramètres (js/features/settings/settingsView.js) */
+.settings-title {
+  margin: 0;
+  text-align: center;
+  font-size: var(--fs-xl);
+}
+
+.settings-section {
+  display: grid;
+  gap: var(--space-200);
+}
+
+.settings-section__title {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--fs-lg);
+  font-weight: 600;
+}
+
+.settings-choices {
+  display: grid;
+  gap: var(--space-100);
+}
+
+.settings-choice {
+  display: flex;
+  align-items: center;
+  gap: var(--space-100);
+  min-height: var(--tap-size);
+  padding: var(--space-100) var(--space-200);
+  border-radius: 0.75rem;
+  cursor: pointer;
+}
+
+.settings-choice__input {
+  flex: none;
+  width: 1.25rem;
+  height: 1.25rem;
+  margin: 0;
+}
+
+.settings-choice__text {
+  display: grid;
+  gap: 0.1rem;
+}
+
+.settings-choice__label {
+  font-weight: 600;
+}
+
+.settings-choice__description {
+  font-size: var(--fs-sm);
+}
+
+.settings-reset {
+  display: grid;
+  gap: var(--space-200);
+}
+
+.settings-reset__description,
+.settings-reset__question,
+.settings-reset__status {
+  margin: 0;
+}
+
+.settings-reset__status:empty {
+  display: none;
+}
+
+.settings-reset__button {
+  width: 100%;
+}
+
+.settings-reset__confirm {
+  display: grid;
+  gap: var(--space-200);
+}
+
+.settings-reset__button[hidden],
+.settings-reset__confirm[hidden] {
+  display: none;
+}
+
+.settings-reset__actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 7rem), 1fr)); /* jamais coupé à 320 px */
+  gap: var(--space-200);
+}
+
+/* Swipe droite -> gauche sur la question (js/ui/swipeGesture.js) :
+   le navigateur garde le défilement vertical, le geste horizontal est
+   laissé à l'application. */
+.question-card--swipeable {
+  touch-action: pan-y;
+  user-select: none;
+  will-change: transform;
+}
+
+.question-card--swipeable.is-dragging {
+  cursor: grabbing;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .question-card--swipeable {
+    transition: none !important;
+  }
+}
+
+.question-next[hidden] {
+  display: none;
+}
+
+.settings-section__hint {
+  margin: 0;
+}
+
+/* Saisie numérique (intervalle de répétition Libre) */
+.settings-number {
+  display: grid;
+  gap: var(--space-100);
+}
+
+.settings-number__row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--space-200);
+}
+
+.settings-number__input {
+  width: 100%;
+  min-height: var(--tap-size);
+  padding-inline: var(--space-300);
+  border-radius: 0.75rem;
+  font: inherit;
+  font-size: var(--fs-lg);
+}
+
+.settings-number__status {
+  margin: 0;
+  font-size: var(--fs-sm);
+}
+
+.settings-number__status:empty {
+  display: none;
+}
+
+/* Écran de création d'une question (js/features/questions/questionFormView.js) */
+.question-form {
+  display: grid;
+  gap: var(--space-300);
+}
+
+.question-form__title {
+  margin: 0;
+  font-size: var(--fs-xl);
+}
+
+.question-form__summary,
+.question-form__error,
+.question-form__hint {
+  margin: 0;
+  font-size: var(--fs-sm);
+}
+
+.question-form__summary:empty,
+.question-form__error:empty {
+  display: none;
+}
+
+.question-form__field {
+  display: grid;
+  gap: var(--space-100);
+}
+
+.question-form__label {
+  font-weight: 600;
+}
+
+.question-form__control {
+  display: grid;
+  gap: var(--space-100);
+}
+
+.question-form__input {
+  width: 100%;
+  min-height: var(--tap-size);
+  padding: var(--space-100) var(--space-300);
+  border-radius: 0.75rem;
+  font: inherit;
+}
+
+.question-form__textarea {
+  resize: vertical;
+  line-height: 1.4;
+}
+
+.question-form__tag-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--space-200);
+}
+
+.question-form__tags,
+.question-form__suggestions {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-100);
+  margin: 0;
+  padding: 0;
+}
+
+.question-form__tags:empty,
+.question-form__suggestions:empty,
+.question-form__hint[hidden] {
+  display: none;
+}
+
+.question-form__tag,
+.question-form__suggestion {
+  min-height: 2.5rem;
+  font: inherit;
+  font-size: var(--fs-sm);
+  cursor: pointer;
+}
+
+.question-form__actions {
+  display: grid;
+  /* Identique à 2 colonnes égales tant que la place suffit ; empilées sinon. */
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 8rem), 1fr));
+  gap: var(--space-200);
+}
+
+.question-form__actions .button {
+  min-width: 0;
+}
+
+/* Liste des tags repliable (Filtres) */
+.filters-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-height: var(--tap-size);
+  padding-inline: var(--space-300);
+  border-radius: 0.75rem;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.filters-toggle__icon {
+  transition: transform 150ms ease-out;
+}
+
+.filters-toggle[aria-expanded="false"] .filters-toggle__icon {
+  transform: rotate(-90deg);
+}
+
+.filters-tags[hidden] {
+  display: none;
+}
+
+/* Tags existants repliables dans le formulaire (réutilise .filters-toggle) */
+.question-form__suggestions-zone {
+  display: grid;
+  gap: var(--space-100);
+}
+
+.question-form__suggestions-zone[hidden],
+.question-form__suggestions-toggle[hidden] {
+  display: none;
+}
+
+.question-form__hint:empty {
+  display: none;
+}
+
+.question-form__id {
+  margin: 0;
+  font-size: var(--fs-sm);
+}
+
+.question-form__id[hidden] {
+  display: none;
+}
+
+.icon-button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Confirmation de suppression sur Main */
+.delete-confirm {
+  display: grid;
+  gap: var(--space-200);
+}
+
+.delete-confirm[hidden] {
+  display: none;
+}
+
+.delete-confirm__message,
+.delete-confirm__status {
+  margin: 0;
+}
+
+.delete-confirm__status:empty {
+  display: none;
+}
+
+.delete-confirm__actions {
+  display: grid;
+  /* Deux colonnes égales, qui passent l'une sous l'autre si la place manque. */
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 7rem), 1fr));
+  gap: var(--space-200);
+}
+
+.delete-confirm__actions .button {
+  min-width: 0;
+  padding-inline: var(--space-200);
+}
+
+/* Écran Questions supprimées */
+.deleted-card {
+  display: grid;
+  gap: var(--space-200);
+}
+
+.deleted-card__title,
+.deleted-card__help,
+.deleted-card__status {
+  margin: 0;
+}
+
+.deleted-card__help,
+.deleted-card__status {
+  font-size: var(--fs-sm);
+}
+
+.deleted-card__status:empty {
+  display: none;
+}
+
+.deleted-list {
+  list-style: none;
+  display: grid;
+  gap: var(--space-200);
+  margin: 0;
+  padding: 0;
+}
+
+.deleted-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    "id restore"
+    "text restore";
+  align-items: center;
+  gap: 0.25rem var(--space-200);
+  padding: var(--space-200) var(--space-300);
+  border-radius: 0.75rem;
+}
+
+.deleted-item__id {
+  grid-area: id;
+  font-size: var(--fs-xs);
+  font-weight: 600;
+}
+
+.deleted-item__text {
+  grid-area: text;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.deleted-item__restore {
+  grid-area: restore;
+}
+
+/* Écran étroit : bouton « Restaurer » sous le texte (pleine largeur de texte). */
+@media (max-width: 24rem) {
+  .deleted-item {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      "id"
+      "text"
+      "restore";
+    align-items: start;
+  }
+
+  .deleted-item__restore {
+    justify-self: end;
+  }
+}
+
+/* Pagination générique (js/ui/pagination.js) */
+.pager {
+  display: grid;
+  /* Aucune largeur minimale forcée par les boutons. */
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  grid-template-areas: "prev info next";
+  align-items: center;
+  gap: var(--space-200);
+}
+
+.pager__prev {
+  grid-area: prev;
+}
+
+.pager__info {
+  grid-area: info;
+}
+
+.pager__next {
+  grid-area: next;
+}
+
+/* Écran étroit : numéro de page au-dessus, boutons côte à côte en dessous. */
+@media (max-width: 24rem) {
+  .pager {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-areas:
+      "info info"
+      "prev next";
+    row-gap: var(--space-100);
+  }
+}
+
+.pager[hidden],
+.filters-search[hidden] {
+  display: none;
+}
+
+.pager .button {
+  min-width: 0;
+  min-height: 2.5rem;
+  padding-inline: var(--space-200);
+  white-space: nowrap;
+}
+
+.pager__info {
+  font-size: var(--fs-xs);
+  white-space: nowrap;
+  text-align: center;
+}
+
+.pager .button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Paramètres > Informations (js/features/settings/infoSection.js) */
+.settings-info {
+  display: grid;
+  gap: var(--space-100);
+  margin: 0;
+}
+
+.settings-info__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-200);
+  padding-block: 0.35rem;
+}
+
+.settings-info__label,
+.settings-info__value {
+  margin: 0;
+}
+
+.settings-info__value {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+/* Paramètres : navigation interne (onglets) */
+.settings-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.25rem;
+  padding: 0.25rem;
+  border-radius: 0.9rem;
+}
+
+.settings-tab {
+  min-height: var(--tap-size);
+  padding: 0.25rem 0.4rem;
+  border: none;
+  border-radius: 0.7rem;
+  font: inherit;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  line-height: 1.15;
+  cursor: pointer;
+  /* Jamais de coupure au milieu d'un mot : libellés courts, sur une ligne. */
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.settings-panel {
+  display: grid;
+  gap: var(--space-200); /* 12 px entre les cartes */
+}
+
+.settings-panel[hidden] {
+  display: none;
+}
+
+.settings-empty {
+  margin: 0;
+}
+
+/* Paramètres > Réglages > Import / Export */
+.settings-io {
+  display: grid;
+  gap: var(--space-300);
+}
+
+.settings-io__part {
+  display: grid;
+  gap: var(--space-200);
+}
+
+.settings-io__part + .settings-io__part {
+  padding-top: var(--space-300);
+}
+
+.settings-io__title {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--fs-md);
+  font-weight: 600;
+}
+
+.settings-io__actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 7rem), 1fr)); /* jamais coupé à 320 px */
+  gap: var(--space-200);
+}
+
+.settings-io__actions .button,
+.settings-io__file-label {
+  padding-inline: var(--space-200);
+  text-align: center;
+}
+
+.settings-io__file-label {
+  position: relative;
+  cursor: pointer;
+}
+
+.settings-io__textarea {
+  width: 100%;
+  min-height: 5.5rem;
+  padding: var(--space-100) var(--space-200);
+  border-radius: 0.75rem;
+  font: inherit;
+  font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+  font-size: var(--fs-sm);
+  resize: vertical;
+}
+
+.settings-io__textarea[hidden],
+.settings-io__preview[hidden],
+.settings-io .button[hidden] {
+  display: none;
+}
+
+.settings-io__preview {
+  display: grid;
+  gap: var(--space-100);
+  padding: var(--space-200) var(--space-300);
+  border-radius: 0.75rem;
+  font-size: var(--fs-sm);
+}
+
+.settings-io__preview-title,
+.settings-io__nothing,
+.settings-io__status {
+  margin: 0;
+}
+
+.settings-io__preview-title {
+  font-weight: 600;
+}
+
+.settings-io__summary,
+.settings-io__warnings,
+.settings-io__errors {
+  margin: 0;
+  padding-left: 1.1rem;
+  display: grid;
+  gap: 0.2rem;
+}
+
+.settings-io__status {
+  font-size: var(--fs-sm);
+}
+
+.settings-io__status:empty {
+  display: none;
+}
+
+/* Paramètres > Réglages : cartes repliables avec effet de dépliement */
+.settings-section--collapsible {
+  gap: 0;
+  padding-block: var(--space-200);
+}
+
+.settings-section__toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-200);
+  width: 100%;
+  min-height: var(--tap-size);
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.settings-section__toggle::after {
+  content: "▾";
+  flex: none;
+  font-size: var(--fs-md);
+  transform: rotate(-90deg);
+  transition: transform 220ms ease;
+}
+
+.settings-section--collapsible[data-expanded="true"] .settings-section__toggle::after {
+  transform: rotate(0deg);
+}
+
+.settings-section__body {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    grid-template-rows 260ms ease,
+    opacity 200ms ease,
+    visibility 0s linear 260ms;
+}
+
+.settings-section--collapsible[data-expanded="true"] .settings-section__body {
+  grid-template-rows: 1fr;
+  opacity: 1;
+  visibility: visible;
+  transition:
+    grid-template-rows 260ms ease,
+    opacity 200ms ease 60ms,
+    visibility 0s;
+}
+
+.settings-section__inner {
+  display: grid;
+  gap: var(--space-200);
+  min-height: 0;
+  overflow: hidden;
+}
+
+.settings-section--collapsible[data-expanded="true"] .settings-section__inner {
+  padding-top: var(--space-200);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .settings-section__body,
+  .settings-section__toggle::after {
+    transition: none !important;
+  }
+}

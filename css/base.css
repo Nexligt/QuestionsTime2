@@ -1,0 +1,120 @@
+/*
+  base.css
+  Reset + design tokens (couleurs, typographie, espacements).
+  Les valeurs de couleur concrètes vivent dans themes.css.
+*/
+
+:root {
+  /* Typographie */
+  --font-body: var(--font-system); /* lot 2 : pointe vers la pile système */
+  --font-display: Georgia, "Iowan Old Style", serif;
+
+  --fs-100: clamp(0.8rem, 0.78rem + 0.2vw, 0.9rem);
+  --fs-200: clamp(0.95rem, 0.92rem + 0.3vw, 1.05rem);
+  --fs-300: clamp(1.1rem, 1.05rem + 0.5vw, 1.3rem);
+  --fs-400: clamp(1.4rem, 1.3rem + 1vw, 1.8rem);
+  --fs-500: clamp(1.9rem, 1.7rem + 2vw, 2.6rem);
+
+  /* Espacements (rem = accessible, s'adapte à la taille de police système) */
+  --space-100: 0.5rem;
+  --space-200: 0.75rem;
+  --space-300: 1rem;
+  --space-400: 1.5rem;
+  --space-500: 2.5rem;
+
+  /* Zone tactile minimale confortable */
+  --tap-size: var(--tap-size-min); /* lot 2 : 44 px (était 3rem) */
+
+  /* ----------------------------------------------------------------
+     Variables communes AJOUTÉES (lot 1 des retouches visuelles).
+     Elles ne remplacent encore aucune valeur existante : les lots
+     suivants les utiliseront progressivement. Couleurs : themes.css.
+     ---------------------------------------------------------------- */
+
+  /* Espacement complémentaire (grille de 4 px) */
+  --space-50: 0.25rem;
+
+  /* Rayons */
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-pill: 999px;
+
+  /* Ombre (rare : éléments posés au-dessus du contenu) */
+  --shadow-overlay: 0 0.5rem 1.5rem var(--color-shadow, rgb(0 0 0 / 0.35));
+
+  /* Typographie cible (pas encore appliquée) */
+  --font-system: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", sans-serif;
+  --fs-xs: 0.75rem; /* 12 px : ID, indications, barre du bas */
+  --fs-sm: 0.8125rem; /* 13 px : descriptions */
+  --fs-md: 0.9375rem; /* 15 px : texte, boutons */
+  --fs-chip: 0.875rem; /* 14 px : pastilles de tags (Filtres) */
+  --fs-lg: 1.0625rem; /* 17 px : titres de cartes */
+  --fs-xl: 1.25rem; /* 20 px : titres de page */
+  --fs-question: clamp(1.05rem, 0.95rem + 1vw, 1.3rem);
+  --lh-tight: 1.15;
+  --lh-normal: 1.45;
+
+  /* Tactile */
+  --tap-size-min: 2.75rem; /* 44 px : minimum absolu */
+  --tap-size-primary: 3rem; /* actions principales */
+
+  /* Zones sûres (encoche, barre de gestes) */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-padding-top: var(--safe-top);
+  -webkit-text-size-adjust: 100%;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: var(--font-body);
+  font-size: var(--fs-md);
+  line-height: 1.5;
+  padding-top: var(--safe-top);
+  padding-bottom: var(--safe-bottom);
+}
+
+h1, h2, h3 {
+  font-family: var(--font-display);
+  line-height: 1.15;
+  margin: 0 0 var(--space-300) 0;
+}
+
+/* Nouvelle échelle (lot 2). Le titre de l'app (.app-title, --fs-400) et le
+   titre du Splash ont leur propre taille : ils ne sont pas concernés. */
+h1 { font-size: var(--fs-xl); }
+h2 { font-size: var(--fs-lg); }
+h3 { font-size: var(--fs-md); }
+
+p { margin: 0 0 var(--space-300) 0; }
+
+button {
+  font: inherit;
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-accent, currentColor);
+  outline-offset: 2px;
+}
+
+/* Respect des préférences de mouvement réduit */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

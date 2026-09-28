@@ -1,0 +1,13 @@
+{
+  "name": "questionstime2",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test \"tests/*.test.js\"",
+    "test:e2e": "node tests/e2e/splashAlignment.e2e.js"
+  },
+  "devDependencies": {
+    "fake-indexeddb": "^6.2.5",
+    "jsdom": "^26.1.0"
+  }
+}

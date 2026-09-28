@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#171226" />
+  <title>QuestionsTime2</title>
+
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" href="assets/icons/app-icon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="assets/icons/app-icon.svg" />
+
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/layout.css" />
+  <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="css/themes.css" />
+</head>
+<body>
+  <!-- Zone principale : le routeur y injecte la vue active -->
+  <main id="view-root" class="view-root" aria-live="polite"></main>
+
+  <!-- Menu inférieur permanent (masqué automatiquement sur la page d'accueil) -->
+  <nav id="bottom-nav" class="bottom-nav" aria-label="Navigation principale" hidden></nav>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

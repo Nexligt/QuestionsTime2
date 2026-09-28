@@ -1,0 +1,294 @@
+/*
+  themes.css
+  Palette : ambiance "soirée / conversation", pensée pour un usage
+  le soir entre amis. Fond profond violet-nuit, accent ambre chaud.
+*/
+
+:root {
+  --color-bg: #201931;
+  --color-surface: #2b2242;
+  --color-text: #f4efe9;
+  --color-text-muted: #b8aecb;
+  --color-accent: #e2b04a;
+  --color-accent-text: #201931;
+  --color-border: #3c3157;
+  --color-danger: #ef7d86;
+  --color-danger-bg: #4a2233;
+
+  /* Ajoutées (lot 1 des retouches visuelles), pas encore utilisées. */
+  --color-surface-2: #241c38; /* fond des champs de saisie */
+  --color-placeholder: #8f84a6; /* texte indicatif (4,6:1 sur les champs) */
+  --color-border-strong: #7a6ba3; /* bord des champs (≥ 3:1 sur fonds et cartes) */
+  --color-shade: #000;
+  --color-shadow: rgb(0 0 0 / 0.35);
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+}
+
+.button {
+  background: var(--color-accent);
+  color: var(--color-accent-text);
+}
+
+.bottom-nav {
+  background: var(--color-surface);
+  border-top: 1px solid var(--color-border);
+}
+
+.nav-item {
+  color: var(--color-text-muted);
+}
+
+.splash__hint {
+  color: var(--color-text-muted);
+}
+
+.nav-item[aria-current="page"] {
+  color: var(--color-accent);
+}
+
+.nav-item__icon svg {
+  fill: currentColor;
+  stroke: currentColor;
+}
+
+.icon-button {
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+.mode-indicator {
+  color: var(--color-accent);
+  border: 1px solid var(--color-accent);
+  background: transparent;
+}
+
+.question-card__hints {
+  color: var(--color-text-muted);
+}
+
+.question-card__id {
+  color: var(--color-text-muted);
+}
+
+.tag-chip {
+  color: var(--color-text-muted);
+  background: transparent;
+}
+
+.filters-help,
+.filters-tags__empty {
+  color: var(--color-text-muted);
+}
+
+.filters-summary--empty {
+  color: var(--color-accent);
+}
+
+.filters-search__input {
+  background: var(--color-bg);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+}
+
+.filter-tag {
+  background: transparent;
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border);
+}
+
+.filter-tag[data-state="required"] {
+  background: var(--color-accent);
+  color: var(--color-accent-text);
+  border-color: var(--color-accent);
+}
+
+.filter-tag[data-state="excluded"] {
+  background: var(--color-danger-bg);
+  color: var(--color-danger);
+  border-color: var(--color-danger);
+  text-decoration: line-through;
+}
+
+.settings-choice {
+  border: 1px solid var(--color-border);
+}
+
+.settings-choice:has(.settings-choice__input:checked) {
+  border-color: var(--color-accent);
+}
+
+.settings-choice__input {
+  accent-color: var(--color-accent);
+}
+
+.settings-choice__description {
+  color: var(--color-text-muted);
+}
+
+.button--danger {
+  background: var(--color-danger);
+  color: var(--color-accent-text);
+}
+
+.button--secondary {
+  background: transparent;
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+}
+
+.settings-reset__status {
+  color: var(--color-text-muted);
+}
+
+.settings-number__input {
+  background: var(--color-bg);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+}
+
+.settings-number__input[aria-invalid="true"] {
+  border-color: var(--color-danger);
+}
+
+.settings-number__status {
+  color: var(--color-text-muted);
+}
+
+.settings-number__status[data-status="error"] {
+  color: var(--color-danger);
+}
+
+.question-form__input {
+  background: var(--color-bg);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+}
+
+.question-form__field--invalid .question-form__input {
+  border-color: var(--color-danger);
+}
+
+.question-form__error,
+.question-form__summary {
+  color: var(--color-danger);
+}
+
+.question-form__hint {
+  color: var(--color-text-muted);
+}
+
+.question-form__tag {
+  background: var(--color-accent);
+  color: var(--color-accent-text);
+  border-color: var(--color-accent);
+}
+
+.question-form__suggestion {
+  background: transparent;
+}
+
+.filters-toggle {
+  background: transparent;
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+}
+
+.question-form__id {
+  color: var(--color-text-muted);
+}
+
+.delete-confirm {
+  border-color: var(--color-danger);
+}
+
+.delete-confirm__status {
+  color: var(--color-danger);
+}
+
+.deleted-card__help,
+.deleted-card__status,
+.deleted-item__id {
+  color: var(--color-text-muted);
+}
+
+.deleted-item {
+  border: 1px solid var(--color-border);
+}
+
+.pager__info {
+  color: var(--color-text-muted);
+}
+
+.settings-info__row + .settings-info__row {
+  border-top: 1px solid var(--color-border);
+}
+
+.settings-info__label {
+  color: var(--color-text-muted);
+}
+
+.settings-tabs {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+}
+
+.settings-tab {
+  background: transparent;
+  color: var(--color-text-muted);
+}
+
+.settings-tab[aria-selected="true"] {
+  background: var(--color-accent);
+  color: var(--color-accent-text);
+}
+
+.settings-io__part + .settings-io__part {
+  border-top: 1px solid var(--color-border);
+}
+
+.settings-io__textarea {
+  background: var(--color-bg);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+}
+
+.settings-io__preview {
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+}
+
+.settings-io__warnings,
+.settings-io__status[data-status="success"] {
+  color: var(--color-accent);
+}
+
+.settings-io__errors,
+.settings-io__status[data-status="error"] {
+  color: var(--color-danger);
+}
+
+/* Splash (couche de lancement) */
+.splash-intro__backdrop {
+  background: var(--color-bg);
+}
+
+.splash-intro .splash__title {
+  color: var(--color-text);
+}
+
+.splash-intro__shade {
+  color: #000;
+}
+
+.splash-intro__shadow {
+  background: radial-gradient(closest-side, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0));
+}
