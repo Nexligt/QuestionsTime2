@@ -119,7 +119,14 @@ export function createMainView() {
 
   const deleteConfirm = createDeleteConfirm();
 
-  view.append(header, actionBar, deleteConfirm.root, questionCard, nextButton);
+  // Bloc central (confirmation éventuelle, carte, « Suivante ») : centré
+  // verticalement dans l'espace entre le bandeau d'actions et la barre du
+  // bas ; reprend sa place en haut (et la page défile) s'il est trop haut.
+  const stage = document.createElement("div");
+  stage.className = "main-stage";
+  stage.append(deleteConfirm.root, questionCard, nextButton);
+
+  view.append(header, actionBar, stage);
 
   wireModeIndicator(modeIndicator);
   const editButton = actionBar.querySelector('[data-action="edit"]');
@@ -468,7 +475,8 @@ function renderQuestion(questionCard, question) {
     tagList.append(item);
   }
 
-  questionCard.append(text, id, tagList);
+  // ID au-dessus du texte, petit et discret.
+  questionCard.append(id, text, tagList);
 }
 
 function createStatusMessage(message) {

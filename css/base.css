@@ -110,6 +110,14 @@ button {
   outline-offset: 2px;
 }
 
+/* Éléments NON interactifs recevant le focus par programme (tabindex="-1",
+   ex. titre de Main après le Splash, pour l'accessibilité) : jamais de
+   cadre. Les vrais boutons et champs gardent leur contour au clavier. */
+[tabindex="-1"]:focus,
+[tabindex="-1"]:focus-visible {
+  outline: none;
+}
+
 /* Respect des préférences de mouvement réduit */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

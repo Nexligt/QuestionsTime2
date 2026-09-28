@@ -73,9 +73,31 @@
 }
 
 /* Carte de la question courante */
+/* Page principale : titre et bandeau en haut, bloc central centré
+   verticalement dans l'espace restant (voir aussi .view-root dans layout.css). */
+.view--main {
+  flex: 1 0 auto;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-300);
+}
+
+.main-stage {
+  flex: 1 0 auto; /* occupe l'espace restant, grandit si le contenu est plus haut */
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* sans débordement : jamais rien de coupé */
+  gap: var(--space-300);
+}
+
 .question-card {
   display: grid;
+  align-content: center;
   gap: var(--space-200);
+  /* Hauteur minimale : une question de 1 à ~5 lignes garde la même carte,
+     donc « Suivante » ne bouge pas d'une question courte à une longue. */
+  min-height: 12rem;
   text-align: center;
 }
 
@@ -87,6 +109,7 @@
 
 .question-card__id {
   margin: 0;
+  letter-spacing: 0.04em;
   font-size: var(--fs-xs);
 }
 

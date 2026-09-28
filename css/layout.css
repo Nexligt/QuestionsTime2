@@ -19,6 +19,14 @@ body {
   padding: var(--space-400) var(--space-300);
 }
 
+/* Page principale : la zone de contenu devient une colonne flexible pour
+   que le bloc central occupe toute la hauteur restante (hauteur issue de
+   body, min-height: 100dvh). Aucune autre page n'est concernée. */
+.view-root:has(> .view--main) {
+  display: flex;
+  flex-direction: column;
+}
+
 /* Quand le menu inférieur est visible, on laisse de la place en bas
    pour que le contenu ne soit jamais masqué derrière lui. */
 body.has-bottom-nav .view-root {

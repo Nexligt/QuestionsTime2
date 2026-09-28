@@ -17,7 +17,7 @@
   cohérent avec un hébergement GitHub Pages.
 */
 
-const CACHE_NAME = "questionstime2-shell-v16";
+const CACHE_NAME = "questionstime2-shell-v17";
 
 // Fichiers indispensables au démarrage de l'app hors ligne.
 // Chemins relatifs : compatible avec un hébergement GitHub Pages
