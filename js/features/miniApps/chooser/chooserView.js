@@ -33,7 +33,7 @@ const HINT_WAITING = "Posez chacun un doigt sur l'écran";
 const HINT_COUNTING = "Ne bougez plus…";
 const HINT_RESULT = "Levez tous les doigts pour recommencer";
 const HINT_SHUFFLING = "Répartition…";
-const HINT_TEAMS_RESULT = "Levez les doigts pour rejouer";
+const HINT_TEAMS_RESULT = "Touchez « Rejouer » pour recommencer";
 const TEAM_COLORS = 6; // .chooser__circle--team-0 … --5 (themes.css)
 const missingHint = (n) => `Encore ${n} doigt${n > 1 ? "s" : ""} au minimum`;
 
@@ -406,6 +406,8 @@ export function openChooser({
     const finger = fingers.get(event.pointerId);
     if (!finger) return;
     if (phase === "result") {
+      // Mode Équipes : les équipes restent affichées doigts levés, jusqu'à « Rejouer ».
+      if (teamsMode) return;
       fingers.delete(event.pointerId);
       if (fingers.size === 0) resetRound();
       return;

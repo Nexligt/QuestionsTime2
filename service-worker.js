@@ -17,7 +17,7 @@
   cohérent avec un hébergement GitHub Pages.
 */
 
-const CACHE_NAME = "questionstime2-shell-v39";
+const CACHE_NAME = "questionstime2-shell-v40";
 const CACHE_PREFIX = "questionstime2-shell-"; // seuls ces caches sont gérés ici (IndexedDB jamais touché)
 
 // Mise à jour : la nouvelle version s'installe puis ATTEND (pas de

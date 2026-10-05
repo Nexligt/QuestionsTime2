@@ -222,3 +222,21 @@ test("réglages de la mini-app (mode, nombre d'équipes, capitaine) mémorisés"
   assert.equal(document.querySelector(".chooser").dataset.mode, CHOOSER_MODES.TEAMS);
   document.querySelector(".chooser__close").click();
 });
+
+test("Équipes : doigts levés (même pendant la répartition), rien ne disparaît jusqu'à « Rejouer »", () => {
+  const o = openTeams(2);
+  for (const id of [1, 2, 3, 4]) pointer(o, "pointerdown", id);
+  timers.fire(); // fin de l'attente : roulette en cours
+  pointer(o, "pointerup", 1); // levé pendant la roulette
+  fireAll();
+  assert.equal(Object.keys(JSON.parse(o.dataset.teams)).length, 4); // toujours réparti
+  for (const id of [2, 3, 4]) pointer(o, "pointerup", id);
+  pointer(o, "pointercancel", 2);
+  assert.equal(circles(o).length, 4);
+  assert.equal(o.dataset.phase, "result");
+  assert.equal(o.querySelector(".chooser__legend").hidden, false);
+  assert.equal(o.querySelector(".chooser__hint").textContent, "Touchez « Rejouer » pour recommencer");
+  o.querySelector(".chooser__replay").click();
+  assert.equal(circles(o).length, 0);
+  assert.equal(o.dataset.phase, "waiting");
+});
