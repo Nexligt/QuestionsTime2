@@ -39,6 +39,7 @@ import { navigateTo } from "../../core/router.js";
 import { formatQuestionId } from "./questionId.js";
 import { openQuestionEditor } from "./questionFormView.js";
 import { openQuestionSearch } from "./questionSearchOverlay.js";
+import { resolvePlayer } from "./playerPick.js";
 import { getTagFilterStates } from "../../data/filtersRepository.js";
 import { attachLeftSwipe } from "../../ui/swipeGesture.js";
 import {
@@ -179,10 +180,11 @@ export function createMainView() {
     openQuestionSearch({ questions: search.questions, onSelect: search.show, returnFocus: searchButton });
   });
 
-  wireQuestionSelection(questionCard, nextButton, (question) => {
+  wireQuestionSelection(questionCard, nextButton, (question, { isNew = false } = {}) => {
     updateEditButton(editButton, question);
     updateEditButton(deleteButton, question);
     deleteConfirm.close();
+    if (question) showPlayer(questionCard, question.id, isNew);
   }, (questions, show) => {
     search.questions = questions;
     search.show = show;
@@ -404,14 +406,14 @@ async function wireQuestionSelection(questionCard, nextButton, onQuestionDisplay
   // (cahier des charges §15) : simple drapeau, pas d'animation.
   let isSelecting = false;
 
-  function renderEngineResult(result) {
+  function renderEngineResult(result, isNew) {
     questionCard.innerHTML = "";
     if (result.status === SELECTION_STATUS.STRICT_EXHAUSTED) {
       questionCard.append(createStrictExhaustedMessage());
       onQuestionDisplayed(null);
     } else {
       renderQuestion(questionCard, result.question);
-      onQuestionDisplayed(result.question);
+      onQuestionDisplayed(result.question, { isNew });
     }
   }
 
@@ -420,14 +422,14 @@ async function wireQuestionSelection(questionCard, nextButton, onQuestionDisplay
    * protégé par le même drapeau anti double-appel dans les deux cas.
    * @param {() => Promise<object>} engineCall
    */
-  async function runEngine(engineCall) {
+  async function runEngine(engineCall, { isNew = true } = {}) {
     if (isSelecting) return;
     isSelecting = true;
     nextButton.disabled = true;
 
     try {
       const result = await engineCall();
-      renderEngineResult(result);
+      renderEngineResult(result, isNew);
     } catch (error) {
       if (error instanceof NoQuestionsAvailableError) {
         // Cas B : la liste de questions elle-même est vide — distinct
@@ -486,7 +488,33 @@ async function wireQuestionSelection(questionCard, nextButton, onQuestionDisplay
   // nouvelle question que s'il n'y en a pas encore (cahier des
   // charges §3, cas A/B/C). Jamais un nouvel enregistrement
   // d'historique pour un simple remontage.
-  await runEngine(() => getCurrentQuestion(questions));
+  await runEngine(() => getCurrentQuestion(questions), { isNew: false });
+}
+
+/**
+ * Option « Joueur désigné » : ajoute « Au tour de : … » dans la carte,
+ * seulement si elle affiche toujours la même question une fois le tirage fait.
+ */
+async function showPlayer(questionCard, questionId, isNew) {
+  let name = null;
+  try {
+    name = await resolvePlayer(questionId, isNew);
+  } catch (error) {
+    console.error("[mainView] Joueur désigné indisponible :", error);
+  }
+  const idLine = questionCard.querySelector(".question-card__id");
+  if (!name || idLine?.dataset.questionId !== String(questionId)) return;
+  questionCard.querySelector(".question-card__player")?.remove();
+  const player = document.createElement("p");
+  player.className = "question-card__player";
+  const label = document.createElement("span");
+  label.className = "question-card__player-label";
+  label.textContent = "Au tour de";
+  const who = document.createElement("strong");
+  who.className = "question-card__player-name";
+  who.textContent = name;
+  player.append(label, who);
+  idLine.after(player);
 }
 
 /**

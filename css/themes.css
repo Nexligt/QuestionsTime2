@@ -489,3 +489,18 @@ body {
 .settings-info__row--discreet .settings-info__value { color: var(--color-text-muted); }
 .update-banner { background: var(--color-surface-2); border: 1px solid var(--color-border-strong); color: var(--color-text); }
 .settings-info__row + .settings-info__row--discreet { border-top: none; }
+
+.question-card__player-label { color: var(--color-text-muted); }
+.question-card__player-name { color: var(--color-accent); }
+
+/* Qui commence ? > Équipes : mêmes couleurs que la mini-app Équipes */
+.chooser__circle--neutral .chooser__dot { background: transparent; border-color: var(--color-text); }
+.chooser__team-number { color: var(--color-accent-text); }
+.chooser__captain-label { background: var(--color-text); color: var(--color-bg); }
+.chooser__circle--team-0 .chooser__dot, .chooser__legend-item--team-0 { background: var(--color-accent); color: var(--color-accent-text); }
+.chooser__circle--team-1 .chooser__dot, .chooser__legend-item--team-1 { background: var(--color-danger); color: var(--color-accent-text); }
+.chooser__circle--team-2 .chooser__dot, .chooser__legend-item--team-2 { background: var(--color-border-strong); color: var(--color-accent-text); }
+.chooser__circle--team-3 .chooser__dot, .chooser__legend-item--team-3 { background: var(--color-text); color: var(--color-accent-text); }
+.chooser__circle--team-4 .chooser__dot, .chooser__legend-item--team-4 { background: var(--color-text-muted); color: var(--color-accent-text); }
+.chooser__circle--team-5 .chooser__dot, .chooser__legend-item--team-5 { background: var(--color-placeholder); color: var(--color-accent-text); }
+.chooser__circle--team-2 .chooser__team-number, .chooser__legend-item--team-2 { color: var(--color-text); }

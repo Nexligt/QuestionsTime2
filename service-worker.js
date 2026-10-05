@@ -17,7 +17,7 @@
   cohérent avec un hébergement GitHub Pages.
 */
 
-const CACHE_NAME = "questionstime2-shell-v35";
+const CACHE_NAME = "questionstime2-shell-v39";
 const CACHE_PREFIX = "questionstime2-shell-"; // seuls ces caches sont gérés ici (IndexedDB jamais touché)
 
 // Mise à jour : la nouvelle version s'installe puis ATTEND (pas de
@@ -78,6 +78,7 @@ const APP_SHELL = [
   "./js/features/questions/deletedQuestionsView.js",
   "./js/features/questions/questionSearch.js",
   "./js/features/questions/questionSearchOverlay.js",
+  "./js/features/questions/playerPick.js",
   "./js/core/textSearch.js",
   "./js/ui/pagination.js",
   "./js/ui/splashIntro.js",

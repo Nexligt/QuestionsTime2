@@ -76,3 +76,33 @@ test("adresse #/settings/miniapps/<id> et retour arrière du téléphone, sans q
   await waitFor(() => window.location.hash === "#/settings/miniapps");
   assert.equal($(view, ".miniapps-menu").hidden, false);
 });
+
+test("onglet « Mini-apps » : retour au menu si déjà dessus ; sinon dernière mini-app ou menu", async () => {
+  window.location.hash = "";
+  const tab = (v, id) => $(v, `.settings-tab[data-tab="${id}"]`);
+  const shown = (v) => ($(v, ".miniapps-app").hidden ? "menu" : $(v, ".miniapps-app__title").textContent);
+  const v = await mount(() => createSettingsView("miniapps"), (x) => x.querySelector(".miniapps-tile"));
+
+  $(v, '.miniapps-tile[data-app="dice"]').click();
+  tab(v, "mini-apps").click(); // déjà sur Mini-apps : menu
+  assert.equal(shown(v), "menu");
+  tab(v, "mini-apps").click(); // menu : reste sur le menu
+  assert.equal(shown(v), "menu");
+
+  $(v, '.miniapps-tile[data-app="wheel"]').click();
+  tab(v, "informations").click();
+  assert.equal(v.dataset.activeTab, "informations");
+  tab(v, "mini-apps").click(); // depuis Infos : dernière mini-app
+  assert.equal(v.dataset.activeTab, "mini-apps");
+  assert.equal(shown(v), "Roue");
+
+  tab(v, "mini-apps").click(); // menu
+  tab(v, "reglages").click();
+  tab(v, "mini-apps").click(); // j'étais sur le menu : menu
+  assert.equal(shown(v), "menu");
+
+  $(v, '.miniapps-tile[data-app="coin"]').click();
+  const again = await mount(() => createSettingsView("informations"), (x) => x.querySelector(".miniapps-tile"));
+  tab(again, "mini-apps").click(); // page Paramètres reconstruite : toujours la dernière
+  assert.equal(shown(again), "Pile ou face");
+});

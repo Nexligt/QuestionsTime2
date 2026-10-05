@@ -31,6 +31,16 @@ import { buildInfoSection } from "./infoSection.js";
 import { buildInstallInvite } from "./installInvite.js";
 import { buildImportExportSection } from "./importExportSection.js";
 import { createMiniAppsPanel } from "../miniApps/miniAppsMenu.js";
+import {
+  PLAYER_PICK,
+  PLAYER_PICK_KEY,
+  PLAYER_PICK_NO_REPEAT_KEY,
+  getPlayerNoRepeat,
+  getPlayerPick,
+  onPlayerPickChange,
+  setPlayerNoRepeat,
+  setPlayerPick,
+} from "../questions/playerPick.js";
 import { replaceHash } from "../../core/router.js";
 import {
   NEXT_NAVIGATION,
@@ -50,6 +60,16 @@ const MODE_OPTIONS = [
     label: "Libre",
     description: "Seules les questions vues récemment sont évitées.",
   },
+];
+
+const PLAYER_PICK_OPTIONS = [
+  { value: PLAYER_PICK.OFF, label: "Désactivé", description: "Aucun joueur n'est désigné." },
+  { value: PLAYER_PICK.ON, label: "Activé", description: "« Au tour de … » s'affiche sur chaque question." },
+];
+
+const PLAYER_NO_REPEAT_OPTIONS = [
+  { value: PLAYER_PICK.ON, label: "Pas deux fois de suite", description: "Un même nom ne sort jamais deux fois d'affilée." },
+  { value: PLAYER_PICK.OFF, label: "Hasard complet", description: "Le même nom peut sortir plusieurs fois de suite." },
 ];
 
 const NEXT_NAVIGATION_OPTIONS = [
@@ -92,6 +112,12 @@ const SETTINGS_SECTIONS = [
     hint: "Nombre de questions différentes avant qu'une question puisse réapparaître en mode Libre.",
     build: buildRecentQuestionCountSetting,
   },
+  {
+    id: "player-pick",
+    title: "Joueur désigné",
+    hint: "À chaque nouvelle question, une entrée de la Roue (Mini-apps > Roue) est tirée au hasard pour répondre.",
+    build: buildPlayerPickSetting,
+  },
   { id: "strict-history", title: "Historique Strict", build: buildStrictHistoryReset },
   { id: "import-export", title: "Import / Export", build: buildImportExportSection },
 ];
@@ -117,6 +143,12 @@ const SETTINGS_TABS = [
 ];
 
 let settingsViewCounter = 0;
+
+/**
+ * Dernier écran de l'onglet Mini-apps (id de l'application, ou null pour
+ * le menu), gardé pour la session : revenir sur l'onglet le réaffiche.
+ */
+let lastMiniApp = null;
 
 /** Contrôleurs des vues affichées (sous-adresse #/settings/…). */
 const subRouteHandlers = new WeakMap();
@@ -150,7 +182,7 @@ export function createSettingsView(subRoute = "") {
 
   view.append(heading, tabList);
 
-  const miniApps = createMiniAppsPanel();
+  const miniApps = createMiniAppsPanel({ onChange: (id) => { lastMiniApp = id; } });
 
   // Onglet choisi à la main : l'adresse suit sans nouvelle entrée
   // d'historique (retour du téléphone : page précédente, pas l'onglet).
@@ -190,6 +222,15 @@ export function createSettingsView(subRoute = "") {
     if (tabDef.miniApps) panel.append(miniApps.root);
 
     tab.addEventListener("click", () => {
+      if (tabDef.miniApps) {
+        if (view.dataset.activeTab === tabDef.id) {
+          // Déjà sur Mini-apps : retour au menu si une application est ouverte.
+          if (miniApps.current()) miniApps.backToMenu({ focus: false });
+          return;
+        }
+        // Depuis un autre onglet : dernière application ouverte, ou le menu.
+        if (lastMiniApp && miniApps.current() !== lastMiniApp) miniApps.show(lastMiniApp, { focus: false });
+      }
       selectTab(tabDef.id);
       syncHash(tabDef.id);
     });
@@ -224,11 +265,9 @@ export function createSettingsView(subRoute = "") {
       selectTab("mini-apps");
       miniApps.show(appId || null);
     } else if (SETTINGS_TABS.some((t) => t.id === section)) {
-      miniApps.show(null);
-      selectTab(section); // #/settings/informations, #/settings/reglages
+      selectTab(section); // #/settings/informations, #/settings/reglages (mini-app gardée)
     } else {
-      miniApps.show(null);
-      selectTab(SETTINGS_TABS[0].id); // "Réglages" par défaut
+      selectTab(SETTINGS_TABS[0].id); // "Réglages" par défaut (mini-app gardée)
     }
   }
   subRouteHandlers.set(view, applySubRoute);
@@ -304,6 +343,48 @@ function buildInformations(labelledBy) {
   const wrapper = document.createElement("div");
   wrapper.className = "settings-informations";
   wrapper.append(buildInfoSection(labelledBy), buildInstallInvite());
+  return wrapper;
+}
+
+/**
+ * Joueur désigné : affichage (activé / désactivé) et répétition des noms.
+ * Suit aussi les changements faits depuis la mini-app Roue.
+ */
+function buildPlayerPickSetting(labelledBy) {
+  const wrapper = document.createElement("div");
+  wrapper.className = "settings-player-pick";
+  const display = buildChoiceSetting({
+    labelledBy,
+    name: "player-pick",
+    options: PLAYER_PICK_OPTIONS,
+    read: getPlayerPick,
+    write: setPlayerPick,
+    fallback: PLAYER_PICK.OFF,
+  });
+  display.classList.add("settings-player-pick__display");
+  const repeatLabel = document.createElement("p");
+  repeatLabel.className = "settings-choice__label settings-player-pick__repeat-label";
+  repeatLabel.id = `${labelledBy}-repeat`;
+  repeatLabel.textContent = "Répétition des noms";
+  const repeat = buildChoiceSetting({
+    labelledBy: repeatLabel.id,
+    name: "player-pick-no-repeat",
+    options: PLAYER_NO_REPEAT_OPTIONS,
+    read: getPlayerNoRepeat,
+    write: setPlayerNoRepeat,
+    fallback: PLAYER_PICK.ON,
+  });
+  repeat.classList.add("settings-player-pick__repeat");
+  wrapper.append(display, repeatLabel, repeat);
+
+  const unsubscribe = onPlayerPickChange(({ key, value }) => {
+    if (!wrapper.isConnected && wrapper.dataset.mounted === "true") { unsubscribe(); return; }
+    const group = key === PLAYER_PICK_KEY ? display : key === PLAYER_PICK_NO_REPEAT_KEY ? repeat : null;
+    if (!group) return;
+    for (const input of group.querySelectorAll("input")) input.checked = input.value === value;
+    group.dataset.value = value;
+  });
+  queueMicrotask(() => { wrapper.dataset.mounted = "true"; });
   return wrapper;
 }
 

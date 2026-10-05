@@ -67,7 +67,7 @@ test("3-4. un seul contenu visible, et chaque choix affiche le bon contenu", asy
   tab(v, "reglages").click();
   assert.deepEqual(visiblePanels(v), ["reglages"]);
   assert.deepEqual(sectionsIn(v, "reglages"), [
-    "selection-mode", "next-navigation", "recent-question-count", "strict-history", "import-export",
+    "selection-mode", "next-navigation", "recent-question-count", "player-pick", "strict-history", "import-export",
   ]);
   // Chaque section n'apparaît que dans son onglet.
   assert.equal(v.querySelectorAll('[data-setting="informations"]').length, 1);

@@ -16,10 +16,11 @@ export const MINI_APPS_ROUTE = "settings/miniapps";
 let menuCounter = 0;
 
 /**
- * @param {{ apps?: typeof MINI_APPS }} [options] - registre (injectable pour les tests).
- * @returns {{ root: HTMLElement, show: (id: string|null) => void, current: () => string|null }}
+ * @param {{ apps?: typeof MINI_APPS, onChange?: (id: string|null) => void }} [options] -
+ *   registre (injectable pour les tests) ; `onChange` : application affichée (null = menu).
+ * @returns {{ root: HTMLElement, show: Function, current: () => string|null, backToMenu: () => void }}
  */
-export function createMiniAppsPanel({ apps = MINI_APPS } = {}) {
+export function createMiniAppsPanel({ apps = MINI_APPS, onChange = () => {} } = {}) {
   const uid = ++menuCounter;
   const root = document.createElement("div");
   root.className = "miniapps";
@@ -83,7 +84,7 @@ export function createMiniAppsPanel({ apps = MINI_APPS } = {}) {
   }
 
   /** Affiche l'application `id`, ou le menu (null / id inconnu). */
-  function show(id) {
+  function show(id, { focus = true } = {}) {
     const app = apps.find((a) => a.id === id) ?? null;
     if ((app?.id ?? null) === currentId) return;
     const previous = currentId;
@@ -96,12 +97,13 @@ export function createMiniAppsPanel({ apps = MINI_APPS } = {}) {
       title.textContent = app.title;
       body.dataset.setting = `mini-app-${app.id}`;
       body.replaceChildren(built.get(app.id));
-      backButton.focus?.({ preventScroll: true });
+      if (focus) backButton.focus?.({ preventScroll: true });
     } else {
       body.replaceChildren();
       pushedHash = false;
-      if (previous) tiles.get(previous)?.focus?.({ preventScroll: true });
+      if (previous && focus) tiles.get(previous)?.focus?.({ preventScroll: true });
     }
+    onChange(currentId);
   }
 
   function open(id) {
@@ -115,13 +117,16 @@ export function createMiniAppsPanel({ apps = MINI_APPS } = {}) {
     show(id);
   }
 
-  backButton.addEventListener("click", () => {
+  /** Retour au menu (bouton « ← Mini-apps » ou onglet « Mini-apps » touché à nouveau). */
+  function backToMenu({ focus = true } = {}) {
     const wasPushed = pushedHash;
-    show(null);
+    show(null, { focus });
     if (!inRouter()) return;
     if (wasPushed) win().history.back();
     else replaceHash(`#/${MINI_APPS_ROUTE}`, win());
-  });
+  }
 
-  return { root, show, current: () => currentId };
+  backButton.addEventListener("click", () => backToMenu());
+
+  return { root, show, current: () => currentId, backToMenu };
 }

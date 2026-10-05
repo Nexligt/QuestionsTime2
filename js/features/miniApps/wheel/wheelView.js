@@ -20,6 +20,7 @@ import {
 import { drawWheel } from "./wheelSvg.js";
 import { prefersReducedMotion } from "../dice/diceRollOverlay.js";
 import { randomUnit } from "../dice/dice.js";
+import { PLAYER_PICK, PLAYER_PICK_KEY, getPlayerPick, onPlayerPickChange, setPlayerPick } from "../../questions/playerPick.js";
 
 const DELETE_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>`;
 
@@ -101,7 +102,39 @@ export function buildWheelApp(labelledBy) {
   addButton.className = "button button--secondary wheel-app__add";
   addButton.textContent = "Ajouter une entrée";
 
-  root.append(stage, result, spinButton, removeLabel, drawnRow, listTitle, list, addButton);
+  // --- Joueur désigné sur la page principale (même réglage que Réglages) ----
+  const pickLabel = document.createElement("label");
+  pickLabel.className = "settings-choice";
+  const pickInput = document.createElement("input");
+  pickInput.type = "checkbox";
+  pickInput.className = "settings-choice__input wheel-app__player-pick";
+  pickInput.disabled = true; // réactivé une fois le réglage lu
+  const pickText = document.createElement("span");
+  pickText.className = "settings-choice__text";
+  const pickName = document.createElement("span");
+  pickName.className = "settings-choice__label";
+  pickName.textContent = "Désigner un joueur à chaque question";
+  const pickDescription = document.createElement("span");
+  pickDescription.className = "settings-choice__description";
+  pickDescription.textContent = "« Au tour de … » s'affiche sur la page principale, avec les entrées de cette roue.";
+  pickText.append(pickName, pickDescription);
+  pickLabel.append(pickInput, pickText);
+
+  root.append(stage, result, spinButton, removeLabel, drawnRow, pickLabel, listTitle, list, addButton);
+
+  getPlayerPick()
+    .catch(() => PLAYER_PICK.OFF)
+    .then((value) => {
+      pickInput.checked = value === PLAYER_PICK.ON;
+      pickInput.disabled = false;
+    });
+  pickInput.addEventListener("change", () => {
+    track(setPlayerPick(pickInput.checked ? PLAYER_PICK.ON : PLAYER_PICK.OFF));
+  });
+  // Réglage modifié ailleurs (Paramètres > Réglages) : case mise à jour.
+  onPlayerPickChange(({ key, value }) => {
+    if (key === PLAYER_PICK_KEY) pickInput.checked = value === PLAYER_PICK.ON;
+  });
 
   // --- État ------------------------------------------------------------------------
   let entries = [];

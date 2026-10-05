@@ -994,7 +994,7 @@
   text-overflow: ellipsis;
   font-size: var(--fs-sm);
   font-weight: 600;
-  line-height: var(--lh-tight);
+  line-height: var(--lh-normal); /* accents des majuscules (« É ») jamais rognés */
 }
 
 .settings-segmented .settings-choice:has(.settings-choice__input:focus-visible) {
@@ -1958,4 +1958,131 @@ html.chooser-active body {
 .update-banner__update {
   padding-inline: var(--space-200);
   font-size: var(--fs-sm);
+}
+
+/* Main : joueur désigné (option « Joueur désigné ») */
+.question-card__player {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: baseline;
+  gap: var(--space-50) var(--space-100);
+  margin: 0;
+  animation: question-player-in 260ms ease-out both;
+}
+
+.question-card__player-label {
+  font-size: var(--fs-sm);
+}
+
+.question-card__player-name {
+  font-size: var(--fs-lg);
+  overflow-wrap: anywhere;
+}
+
+@keyframes question-player-in {
+  from { opacity: 0; transform: scale(0.9); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .question-card__player { animation: none; }
+}
+
+/* Réglages > Joueur désigné : affichage + répétition */
+.settings-player-pick {
+  display: grid;
+  gap: var(--space-200);
+}
+
+.settings-player-pick__repeat-label {
+  margin: var(--space-100) 0 0;
+}
+
+/* « Qui commence ? » : mode Équipes */
+.chooser-app__label {
+  margin: 0;
+}
+
+.chooser-app__teams {
+  display: grid;
+  gap: var(--space-200);
+}
+
+.chooser-app__teams[hidden],
+.chooser__legend[hidden],
+.chooser__replay[hidden] {
+  display: none;
+}
+
+.chooser__circle--neutral .chooser__dot {
+  border: 3px solid;
+}
+
+.chooser__team-number {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: calc(var(--fs-xl) * 1.6);
+  font-weight: 800;
+  pointer-events: none;
+}
+
+.chooser__circle--captain {
+  z-index: 1; /* étiquette « Capitaine » au-dessus des cercles voisins */
+}
+
+.chooser__circle--captain .chooser__dot {
+  scale: 1.3;
+  transition: scale 200ms ease-out;
+}
+
+.chooser__captain-label {
+  position: absolute;
+  top: calc(100% + var(--space-300));
+  left: 50%;
+  translate: -50% 0;
+  padding: var(--space-50) var(--space-100);
+  border-radius: var(--radius-pill);
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.chooser__legend {
+  position: absolute;
+  top: calc(var(--space-300) + env(safe-area-inset-top, 0px));
+  left: var(--space-300);
+  right: calc(var(--tap-size-min) + var(--space-400));
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-100);
+  margin: 0;
+  pointer-events: none;
+}
+
+.chooser__legend-item {
+  padding: var(--space-50) var(--space-200);
+  border-radius: var(--radius-pill);
+  font-size: var(--fs-xs);
+  font-weight: 700;
+}
+
+.chooser__replay {
+  position: absolute;
+  left: 50%;
+  bottom: calc(var(--space-500) + var(--space-500) + var(--space-300) + var(--safe-bottom));
+  translate: -50% 0;
+  z-index: 2;
+}
+
+/* Résultat des équipes : plus d'anneau d'attente. */
+.chooser--teams-result .chooser__ring {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chooser__circle--captain .chooser__dot {
+    transition: none;
+  }
 }
